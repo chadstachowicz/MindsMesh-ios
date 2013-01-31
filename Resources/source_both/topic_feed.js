@@ -554,60 +554,7 @@ win.addEventListener('focus', function()
 });
 
 var lastDistance = 0;
-tableView.addEventListener('scroll',function(e)
-{
-	var offset = e.contentOffset.y;
-	var height = e.size.height;
-	var total = offset + height;
-	var theEnd = e.contentSize.height;
-	var distance = theEnd - total;
 
-	// going down is the only time we dynamically load,
-	// going up we can safely ignore -- note here that
-	// the values will be negative so we do the opposite
-	if (!pulling && !updating && !reloading && (distance < lastDistance) && (row.length>=10))
-	{
-		// adjust the % of rows scrolled before we decide to start fetching
-		var nearEnd = theEnd * .75;
-
-		if (!pulling && !updating && !reloading && (total >= nearEnd))
-		{
-			beginUpdate();
-		}
-	}
-	else if (offset < -65.0 && !pulling && !reloading && !updating)
-	{
-		var t = Ti.UI.create2DMatrix();
-		t = t.rotate(-180);
-		pulling = true;
-		arrow.animate({transform:t,duration:180});
-		statusLabel.text = "Release to refresh...";
-	}
-	else if((offset > -65.0 && offset < 0 ) && pulling && !reloading && !updating)
-	{
-		pulling = false;
-		var t = Ti.UI.create2DMatrix();
-		arrow.animate({transform:t,duration:180});
-		statusLabel.text = "Pull down to refresh...";
-	}    
-});
-
-tableView.addEventListener('dragEnd', function()
-{	
-	if(pulling && !reloading && !updating)
-	{
-		reloading = true;
-		pulling = false;
-		arrow.hide();
-		actInd.show();
-		statusLabel.text = "Reloading...";
-		tableView.setContentInsets({top:60},{animated:true});
-		tableView.scrollToTop(-60,true);
-		arrow.transform=Ti.UI.create2DMatrix();
-		beginReloading();
-		reloadNotifications();
-	}
-});
 function beginUpdate()
 {
 	updating = true;

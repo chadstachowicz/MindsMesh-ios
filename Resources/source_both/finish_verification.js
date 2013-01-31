@@ -32,6 +32,15 @@ var confirm = Titanium.UI.createButton({
 						xhr.onload = function(){
 						var response = this.responseText;
 						var user = JSON.parse(response);
+						for (i=0;i<user.entity_users.length;i++){
+							if (user.entity_users[i].entity.moodle_url != null)
+							{
+								Titanium.App.Properties.setString("moodle_entity_id",user.entity_users[i].entity.id);
+								Titanium.App.Properties.setString("moodle_url",user.entity_users[i].entity.moodle_url);
+								Titanium.App.Properties.setString("entity_user_id",user.entity_users[i].id);
+							}	
+						}
+						Titanium.App.fireEvent('reloadMenu');
 						if(user.entity_users.length > 0)
 						{
 							if(Titanium.App.Properties.getString("moodle_entity_id") != false && Titanium.App.Properties.hasProperty('moodle-user') == false){

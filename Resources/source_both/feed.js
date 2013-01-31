@@ -323,6 +323,7 @@ xhr.send()
 			}
 		
 		});
+win.add(tableView);
 var brainlabel = [];
 
 var btnPost = Titanium.UI.createButton({
@@ -426,16 +427,7 @@ tableHeader.add(statusLabel);
 tableHeader.add(lastUpdatedLabel);
 tableHeader.add(actInd);
 
-scrollView.add(tableHeader);
-scrollView.add(tableView);
-win.add(scrollView);
-var init = setInterval(function(e){
-            if (offset==60) {
-                clearInterval(init);
-            }
-            scrollView.scrollTo(0,60);
-        },100);
-
+tableView.headerPullView = tableHeader;
 
 var reloading = false;
 var updating = false;
@@ -514,44 +506,42 @@ win.addEventListener('focus', function()
 });
 
 var lastDistance = 0;
-scrollView.addEventListener('scroll',function(e)
+tableView.addEventListener('scroll',function(e)
 {
-//	var height = tableView.height;
-//	var total = offset + height;
-//	var theEnd = e.contentSize.height;
-//	var distance = theEnd - total;
+	var offset = e.contentOffset.y;
+	var height = e.size.height;
+	var total = offset + height;
+	var theEnd = e.contentSize.height;
+	var distance = theEnd - total;
 
-	if (e.y!=null) {
-        offset = e.y;
-    }
-        if (!pulling && !updating && !reloading && offset <= 5) {
-        var t = Ti.UI.create2DMatrix();
-        t = t.rotate(-180);
-        arrow.animate({
-            transform : t,
-            duration : 180
-        });
-        statusLabel.text = 'Release To Reload';
-    }
-    else if (!pulling && !updating && !reloading && offset > 5 && offset < 60) {             
-        var t = Ti.UI.create2DMatrix();
-        arrow.animate({
-            transform : t,
-            duration : 180
-        });
-        statusLabel.text = 'Pull To Refresh';
-    }
-    
-//	if (!pulling && !updating && !reloading && (distance < lastDistance) && (row.length>=10))
-//	{
+	// going down is the only time we dynamically load,
+	// going up we can safely ignore -- note here that
+	// the values will be negative so we do the opposite
+	if (!pulling && !updating && !reloading && (distance < lastDistance) && (row.length>=10))
+	{
 		// adjust the % of rows scrolled before we decide to start fetching
-//		var nearEnd = theEnd * .75;
+		var nearEnd = theEnd * .75;
 
-//		if (!pulling && !updating && !reloading && (total >= nearEnd))
-//		{
-//			beginUpdate();
-//		}
-//	} 
+		if (!pulling && !updating && !reloading && (total >= nearEnd))
+		{
+			beginUpdate();
+		}
+	}
+	else if (offset < -65.0 && !pulling && !reloading && !updating)
+	{
+		var t = Ti.UI.create2DMatrix();
+		t = t.rotate(-180);
+		pulling = true;
+		arrow.animate({transform:t,duration:180});
+		statusLabel.text = "Release to refresh...";
+	}
+	else if((offset > -65.0 && offset < 0 ) && pulling && !reloading && !updating)
+	{
+		pulling = false;
+		var t = Ti.UI.create2DMatrix();
+		arrow.animate({transform:t,duration:180});
+		statusLabel.text = "Pull down to refresh...";
+	}    
 });
 
 tableView.addEventListener('dragEnd', function()
