@@ -1,6 +1,5 @@
 Ti.include("model/api.js");
 var win = Titanium.UI.currentWindow;
-
 var winModal = Ti.UI.createWindow({
         backgroundColor : '#B0000000',
         visible: false
@@ -261,7 +260,7 @@ xhr.send()
 var brainlabel = [];
 var replybrainlabel = [];
 var btnPost = Titanium.UI.createButton({
-	title:'Answer',
+	title:'Answer'
 });
 
 btnPost.addEventListener('click', function(e){

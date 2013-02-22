@@ -285,8 +285,6 @@ xhr.send()
 
 var btnCreate = Titanium.UI.createButton({
 	image:'../images/Marker.png',
-	height: 'auto',
-	width: 20
 });
 function currentLocation(latitude,longitude){
 

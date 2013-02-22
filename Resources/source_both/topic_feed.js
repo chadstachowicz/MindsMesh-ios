@@ -12,6 +12,22 @@ var btnBar = Ti.UI.createButtonBar({
 });
 }
 win.setRightNavButton(btnBar);
+
+  	var loadView = Ti.UI.createWindow({
+    	backgroundColor: 'black',
+    	opacity: .90,
+    	height: Ti.Platform.displayCaps.platformHeight,
+    	width: Ti.Platform.displayCaps.platformWidth
+	});
+ 
+	var loadIndicator = Ti.UI.createActivityIndicator({
+    	style: Ti.UI.iPhone.ActivityIndicatorStyle.BIG,
+    	message: 'Loading Moodle...',
+    	font : 'Arial',
+    	color: '#FFF'
+	});
+	
+	
 var winModal = Ti.UI.createWindow({
         backgroundColor : '#B0000000',
         visible: false
@@ -362,12 +378,18 @@ btnBar.addEventListener('click', function(e) {
     	title:'Moodle Account',
    	 	url:'moodle_account.js',
    	 	navGroup: win.navGroup,
+   	 	class_id: win.class_id,
    	 	backgroundColor:'#ecfaff',
    	 	layout:'absolute',
    	 	barColor: '#46a546'
    	});
    	win.navGroup.open(win1,{animated:false});
   	} else {
+
+ 
+	loadView.add(loadIndicator);
+	loadView.open();
+	loadIndicator.show();
   	var postData = {username: Titanium.App.Properties.getString('moodle-user'), password: Titanium.App.Properties.getString('moodle-pass')};	
   	xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url"),postData);
 	xhr.onload = function(){
@@ -554,6 +576,60 @@ win.addEventListener('focus', function()
 });
 
 var lastDistance = 0;
+tableView.addEventListener('scroll',function(e)
+{
+	var offset = e.contentOffset.y;
+	var height = e.size.height;
+	var total = offset + height;
+	var theEnd = e.contentSize.height;
+	var distance = theEnd - total;
+
+	// going down is the only time we dynamically load,
+	// going up we can safely ignore -- note here that
+	// the values will be negative so we do the opposite
+	if (!pulling && !updating && !reloading && (distance < lastDistance) && (row.length>=10))
+	{
+		// adjust the % of rows scrolled before we decide to start fetching
+		var nearEnd = theEnd * .75;
+
+		if (!pulling && !updating && !reloading && (total >= nearEnd))
+		{
+			beginUpdate();
+		}
+	}
+	else if (offset < -65.0 && !pulling && !reloading && !updating)
+	{
+		var t = Ti.UI.create2DMatrix();
+		t = t.rotate(-180);
+		pulling = true;
+		arrow.animate({transform:t,duration:180});
+		statusLabel.text = "Release to refresh...";
+	}
+	else if((offset > -65.0 && offset < 0 ) && pulling && !reloading && !updating)
+	{
+		pulling = false;
+		var t = Ti.UI.create2DMatrix();
+		arrow.animate({transform:t,duration:180});
+		statusLabel.text = "Pull down to refresh...";
+	}    
+});
+
+tableView.addEventListener('dragEnd', function()
+{	
+	if(pulling && !reloading && !updating)
+	{
+		reloading = true;
+		pulling = false;
+		arrow.hide();
+		actInd.show();
+		statusLabel.text = "Reloading...";
+		tableView.setContentInsets({top:60},{animated:true});
+		tableView.scrollToTop(-60,true);
+		arrow.transform=Ti.UI.create2DMatrix();
+		beginReloading();
+		reloadNotifications();
+	}
+});
 
 function beginUpdate()
 {
@@ -979,11 +1055,14 @@ function redirectToMoodle(response){
 	while((hits = regex.exec(response)) !== null) {
 		var regex2 = /([a-zA-Z]+)-([\d\w]+)/i;
     	var found = regex2.exec(hits[1]);
-        if ((found[1] + ' ' + found[2]) == win.class_number){
-        	totalFound.push(found);
-        	totalURL.push(hits[2]);
-        }
+    	if( found != null){	
+        	if ((found[1] + ' ' + found[2]) == win.class_number){
+        		totalFound.push(found);
+        		totalURL.push(hits[2]);
+        	}
+       }
     }
+	loadView.close();
     if (totalFound.length == 0) {
 		alert("No Moodle Course found for this discussion.  Make sure course Numbers between MindsMesh.com and Moodle match exactly, and that you are a part of the class on your schools Moodle.");
 	} else if ( totalFound.length == 1){

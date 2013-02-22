@@ -7,14 +7,70 @@ var btnPost = Titanium.UI.createButton({
 });
 var selectedId = 0;
 win.setRightNavButton(btnPost);
+var movieModal = Ti.UI.createWindow({
+        backgroundColor : '#00000000',
+        barColor: '#46a546',
+        title: 'Video',
+        orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
 
+});
+
+
+if(win.movie != null)
+{
+	var activeMovie = Ti.Media.createVideoPlayer({
+    backgroundColor: '#000',
+    fullscreen: true,
+    scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
+    mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
+    media: win.movie,
+    autoplay: false
+});
+
+    var thumbImage = activeMovie.thumbnailImageAtTime(0,Ti.Media.VIDEO_TIME_OPTION_NEAREST_KEYFRAME);
+    var movPict = Titanium.UI.createImageView({
+				image: thumbImage,
+				top: 60,
+				left: 0,
+				height: 'auto',
+				width: 75,
+			});
+			var playButton = Titanium.UI.createImageView({
+				image: '../images/LH2-Play-icon-2.png',
+				top: 100,
+				left: 15,
+				height: 32,
+				zIndex: 1,
+				width: 32,
+			});
+			win.add(playButton);
+			movPict.addEventListener('click', function(e){
+				win.navGroup.open(movieModal,{animated:false});
+				movieModal.add(activeMovie);
+			activeMovie.addEventListener('fullscreen', function(e){
+    			if (e.entering == 0) {
+       				 win.navGroup.close(movieModal);
+    			};
+			});
+			});
+			playButton.addEventListener('click', function(e){
+				win.navGroup.open(movieModal,{animated:false});
+				movieModal.add(activeMovie);
+			activeMovie.addEventListener('fullscreen', function(e){
+    			if (e.entering == 0) {
+       				 win.navGroup.close(movieModal);
+    			};
+			});
+			});
+			win.add(movPict);
+}
 
 if (Titanium.Platform.osname == 'iphone')
 {
 var ta1 = Titanium.UI.createTextArea({
 	editable: true,
 	top:0,
-	left:55,
+	left:80,
 	height: 155,
 	width: (Titanium.Platform.displayCaps.platformWidth - 55),
 	backgroundColor:'#ecfaff',
@@ -58,7 +114,7 @@ var pict = Titanium.UI.createImageView({
 				width:75,
 			});
 }	
-win.add(pict);		
+win.add(pict);	
 win.add(ta1);
 var pickerSelected = 0;
 var timesfired = 0;
@@ -136,7 +192,11 @@ picker.addEventListener('focus', function(e){
 	my_combo.blur();
 	my_combo.enabled = false;
 });
+win.addEventListener('focus', function(e){
+	ta1.focus();
+});
 ta1.focus();
+
 }
 
 xhr.send();

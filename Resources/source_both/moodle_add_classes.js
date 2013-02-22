@@ -435,7 +435,7 @@ if (checker == true){
 	alert('You must select at least one class to run the wizard.');
 }
 });
-var dialogBox = Titanium.UI.createAlertDialog({title: 'Import Wizard', message: 'Please select the classes from Moodle that are current or you would like to discuss through Minds Mesh.'});
+var dialogBox = Titanium.UI.createAlertDialog({title: 'Import Wizard', message: 'Please select the classes from Moodle that are current or you would like to discuss through Minds Mesh.', buttonNames: 'OK'});
 dialogBox.show();
 function populateWizard(response){
 //	var regex = /(http.+course\/view\.php\?id=\d+)">([\w\d\s:-]+)<\/a><\/p>/ig;
@@ -443,8 +443,6 @@ function populateWizard(response){
 	while((hits = regex.exec(response)) !== null) {
             var fbRow = Titanium.UI.createTableViewRow({
                 backgroundColor:'#ecfaff',
-              //  title: hits[2],
-              //  Moodurl: hits[1],
                 title: hits[1],
                 Moodurl: hits[2],
                 hasCheck: false

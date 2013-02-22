@@ -296,6 +296,9 @@ function redirectToWizard(){
 					alert("Your moodle credentials were good, enjoy!")
 					ta1.blur();
 					ta2.blur();
+					if (win.class_id != null){
+						
+					}
 				}
 				Titanium.App.Properties.setString('moodle-wizard-run',true)
 }

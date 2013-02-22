@@ -31,67 +31,67 @@ function createHttpClient(mode,url,data,header)
 }
 function getNotificationsGrouped(accessToken)
 {
-	url = 'https://mindsmesh.com/api/v1/notifications/grouped/with_parents.json?access_token=' + accessToken;
+	url = 'http://192.168.1.20:3000/api/v1/notifications/grouped/with_parents.json?access_token=' + accessToken;
 	xhr = createHttpClient('GET',url);
 	return xhr;
 }
 function postRegisterDevice(accessToken,data)
 {
-	url = 'https://mindsmesh.com/api/v1/home/register_device?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/home/register_device?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url,data);
 	return xhr;
 }
 function postTopicCreate(accessToken,data)
 {
-	url = 'https://mindsmesh.com/api/v1/topics?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/topics?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url,data);
 	return xhr;
 }
 function postEntityJoin(accessToken,data)
 {
-	url = 'https://mindsmesh.com/api/v1/home/entities?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/home/entities?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url,data);
 	return xhr;
 }
 function postPostCreate(accessToken,data)
 {
-	url = 'https://mindsmesh.com/api/v1/posts?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/posts?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url,data);
 	return xhr;
 }
 function postReplyCreate(accessToken,postId,data)
 {
-	url = 'https://mindsmesh.com/api/v1/posts/' + postId + '/replies?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/posts/' + postId + '/replies?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url,data);
 	return xhr;
 }
 function postTopicJoin(accessToken,topicId)
 {
-	url = 'https://mindsmesh.com/api/v1/topics/' + topicId + '/join.json?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/topics/' + topicId + '/join.json?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url);
 	return xhr;
 }
 function postTopicSearch(accessToken,data)
 {
-	url = 'https://mindsmesh.com/api/v1/home/search_topics?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/home/search_topics?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url,data);
 	return xhr;
 }
 function postLogin(FBaccessToken)
 {
-	url = 'https://mindsmesh.com/api/v1/session/login?fb_access_token=' + FBaccessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/session/login?fb_access_token=' + FBaccessToken; 
 	xhr = createHttpClient('POST',url);
 	return xhr;
 }
 function postTopicLeave(accessToken,topicId)
 {
-	url = 'https://mindsmesh.com/api/v1/topics/' + topicId + '/leave.json?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/topics/' + topicId + '/leave.json?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url);
 	return xhr;
 }
 function postNotificationMarkAsRead(accessToken,notificationId)
 {
-	url = 'https://mindsmesh.com/api/v1/notifications/' + notificationId + '/mark_as_read?access_token=' + accessToken; 
+	url = 'http://192.168.1.20:3000/api/v1/notifications/' + notificationId + '/mark_as_read?access_token=' + accessToken; 
 	xhr = createHttpClient('POST',url);
 	return xhr;
 }
@@ -99,28 +99,28 @@ function getPostsWithFamily(accessToken,before)
 {
 	if(before)
 	{
-		url = 'https://mindsmesh.com/api/v1/posts/with_family?access_token=' + accessToken + '&before=' + before;
+		url = 'http://192.168.1.20:3000/api/v1/posts/with_family?access_token=' + accessToken + '&before=' + before;
 	} else {
-		url = 'https://mindsmesh.com/api/v1/posts/with_family?access_token=' + accessToken;
+		url = 'http://192.168.1.20:3000/api/v1/posts/with_family?access_token=' + accessToken;
 	}
 	xhr = createHttpClient('GET',url);
 	return xhr;
 }
 function getPostWithChildren(accessToken,postId)
 {
-	url = 'https://mindsmesh.com/api/v1/posts/' + postId + '/with_children?access_token=' + accessToken;
+	url = 'http://192.168.1.20:3000/api/v1/posts/' + postId + '/with_children?access_token=' + accessToken;
 	xhr = createHttpClient('GET',url);
 	return xhr;
 }
 function getNotification(accessToken,notificationId)
 {
-	url = 'https://mindsmesh.com/api/v1/notifications/' + notificationId + '?access_token=' + accessToken;
+	url = 'http://192.168.1.20:3000/api/v1/notifications/' + notificationId + '?access_token=' + accessToken;
 	xhr = createHttpClient('GET',url);
 	return xhr;
 }
 function getUserWithChildren(accessToken,userId)
 {
-	url = 'https://mindsmesh.com/api/v1/users/' + userId + '/with_children.json?access_token=' + accessToken;
+	url = 'http://192.168.1.20:3000/api/v1/users/' + userId + '/with_children.json?access_token=' + accessToken;
 	xhr = createHttpClient('GET',url);
 	return xhr;
 }
@@ -128,9 +128,9 @@ function getTopicPostsWithFamily(accessToken,topicId,before)
 {
 	if(before)
 	{
-		url = 'https://mindsmesh.com/api/v1/topics/' + topicId + '/posts/with_family?access_token=' + accessToken + '&before=' + before;
+		url = 'http://192.168.1.20:3000/api/v1/topics/' + topicId + '/posts/with_family?access_token=' + accessToken + '&before=' + before;
 	} else {
-		url = 'https://mindsmesh.com/api/v1/topics/' + topicId + '/posts/with_family?access_token=' + accessToken;
+		url = 'http://192.168.1.20:3000/api/v1/topics/' + topicId + '/posts/with_family?access_token=' + accessToken;
 	}
 	xhr = createHttpClient('GET',url);
 	return xhr;
