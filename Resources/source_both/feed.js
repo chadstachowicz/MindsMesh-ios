@@ -1,5 +1,6 @@
 Ti.include("model/api.js");
 var offset = 0;
+var data = [];
 var win = Titanium.UI.currentWindow;
 var shareWhoModal = Ti.UI.createWindow({
         backgroundColor : '#B0000000',
@@ -162,6 +163,7 @@ Titanium.Media.showCamera({
 			 	
 			 	
 			 	var dlg = Titanium.UI.createAlertDialog({
+			 	box: true,
     			message:'If you exit your content will be lost from this post, is that ok?', 
     			buttonNames: ['Yes','Cancel']
   			});
@@ -204,6 +206,9 @@ Titanium.Media.showCamera({
 	suppressReturn:false,
 	keyboardToolbar: [btnDone]
 });
+   		 btnDone.addEventListener('click', function(e){
+   		 	ta1.blur();
+   		 });
 ta1._hintText = ta1.value;
  
 ta1.addEventListener('focus',function(e){
@@ -252,6 +257,76 @@ ta1.addEventListener('blur',function(e){
 			box: true,
 			top: 10
 		});
+		classButton.addEventListener('click', function(e){
+			
+			xhr = getUserWithChildren(Titanium.App.Properties.getString('mmat'),Titanium.App.Properties.getString('userid'));
+			xhr.onload = function(){
+				var response = this.responseText;
+				var user = JSON.parse(response);
+				for(c=0;c<user.topic_users.length;c++){
+            		data[c]=Ti.UI.createPickerRow({title:user.topic_users[c].topic.name,topic_user_id:user.topic_users[c].id});
+       			 }
+       			// turn on the selection indicator (off by default)
+			var picker = Ti.UI.createPicker({
+				bottom: 0,
+				width: Titanium.UI.FILL
+			});
+			var picker_view = Titanium.UI.createView({
+				height:251,
+				zIndex: 25,
+				bottom:0
+			});
+ 
+			var cancel =  Titanium.UI.createButton({
+				title:'Cancel',
+				style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+			});
+ 
+			var done =  Titanium.UI.createButton({
+				title:'Finish',
+				style:Titanium.UI.iPhone.SystemButtonStyle.DONE
+			});
+ 
+			var spacer =  Titanium.UI.createButton({
+				systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+			});
+ 
+			var toolbar =  Titanium.UI.createToolbar({
+				top:0,
+				height: 51,
+				items:[cancel,spacer,done]
+			});
+			cancel.addEventListener('click',function() {
+				picker_view.hide();
+			});
+			done.addEventListener('click', function(){
+				var postData = {'post':{'topic_user_id': selectedId, 'text' :ta1.value}, 'file': event.media.toBlob()};
+				xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
+				xhr.onload = function(){
+					var response = this.responseText;
+					var test = JSON.parse(response);
+					if (win.source == 'class_feed'){
+						Titanium.App.fireEvent('event_three',{data:'posted'});
+					} else {
+						Titanium.App.fireEvent('event_one',{data:'posted'});
+					}
+					win.navGroup.close(win);
+
+				};
+				xhr.send(JSON.stringify(postData));
+				picker_view.hide();
+				shareWhoModal.close();
+			});
+			
+			picker.SelectionIndicator = true;
+			picker.add(data);
+			picker_view.add(toolbar);
+			picker_view.add(picker);
+			shareWhoModal.add(picker_view);
+			picker.show();
+		}
+		xhr.send();
+});
 	
 		
 
@@ -355,7 +430,7 @@ movieModal.addEventListener('close', function(e){
     			if (e.entering == 0) {
     				win.navGroup.close(movieModal);
     			};
-			});
+			}); 
 			});
 			view.add(movPict);
 			view.add(playButton);

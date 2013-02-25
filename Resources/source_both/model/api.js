@@ -17,7 +17,9 @@ function createHttpClient(mode,url,data,header)
 	var xhr = Titanium.Network.createHTTPClient({enableKeepAlive:false, timeout:6000});
 	xhr.retries = 0;
 	xhr.open(mode,url);
-	if (header != 'NONE'){
+	if(header == 'FILE'){
+		httpClient.setRequestHeader("Content-type", "multipart/form-data;");
+	} else if (header != 'NONE'){
 	xhr.setRequestHeader("Content-Type", "application/json");
 	if(Titanium.Platform.osname == 'android'){
 	var androidUserAgent = 'Mozilla/5.0 (Linux; U; ' + Ti.Platform.name + ' ' + Ti.Platform.version + '; ' + Ti.Locale.currentLocale + '; ' + Ti.Platform.model + ' AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1';
@@ -56,7 +58,7 @@ function postEntityJoin(accessToken,data)
 function postPostCreate(accessToken,data)
 {
 	url = 'http://192.168.1.20:3000/api/v1/posts?access_token=' + accessToken; 
-	xhr = createHttpClient('POST',url,data);
+	xhr = createHttpClient('POST',url,data,'FILE');
 	return xhr;
 }
 function postReplyCreate(accessToken,postId,data)
