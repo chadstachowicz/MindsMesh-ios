@@ -1,6 +1,6 @@
 Ti.include("model/api.js");
 var win = Titanium.UI.currentWindow;
-if (win.moodle == true){
+if (win.moodle != null){
 var btnBar = Ti.UI.createButtonBar({
     labels:['Post','Moodle'],
     backgroundColor:'#46a546',
@@ -60,6 +60,7 @@ var winModal = Ti.UI.createWindow({
 			{
 				var win1 = Titanium.UI.createWindow({  
     			url:'post.js',
+    			navGroup: win.navGroup,
     			backgroundColor:'#ecfaff',
     			barColor: '#46a546',
     			notModal: winModal
@@ -391,14 +392,14 @@ btnBar.addEventListener('click', function(e) {
 	loadView.open();
 	loadIndicator.show();
   	var postData = {username: Titanium.App.Properties.getString('moodle-user'), password: Titanium.App.Properties.getString('moodle-pass')};	
-  	xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url"),postData);
+  	xhr = postLoginToMoodle(win.moodle,postData);
 	xhr.onload = function(){
 		var response = this.responseText;
 var regexSess = /Your\ssession\shas/i;
 var regexSess2 = /your\slogin\ssession/i;
 			var regexLog = /Invalid\slogin/i;
 			if(response.match(regexSess2)) {
-				xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url"),postData);
+				xhr = postLoginToMoodle(win.moodle,postData);
 				xhr.onload = function(){
 					var response2 = this.responseText;
 					redirectToMoodle(response2);

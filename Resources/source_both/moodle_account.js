@@ -255,14 +255,14 @@ btnCreate.addEventListener('click', function(e){
 		} else {
 			var postData = {username: ta1.value, password: ta2.value};
 			//xhr = postLoginToMoodle("http://elondev.mrooms3.net/login/index.php",postData);
-			xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url"),postData);
+			xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url_2"),postData);
 			xhr.onload = function(){
 			var response = this.responseText;
 			var regexSess = /Your\ssession\shas/;
 var regexSess2 = /your\slogin\ssession/;
 			var regexLog = /Invalid\slogin/;
 			if(response.match(regexSess2)) {
-				xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url"),postData);
+				xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url_2"),postData);
 				xhr.onload = function(){
 					var response2 = this.responseText;
 					redirectToWizard();

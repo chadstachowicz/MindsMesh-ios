@@ -162,7 +162,7 @@ var labelIcon = Titanium.UI.createImageView({
 			});
 fbRow10.add(labelIcon);
 fbRow10.add(labelTitle);
-if(Titanium.App.Properties.getString("moodle_entity_id") == 2){
+if(Titanium.App.Properties.getString("moodle_entity_2") == 2){
 menuTitles = [fbRow1, fbRow9] } else{
 	menuTitles = [fbRow1];
 }
@@ -203,18 +203,20 @@ menuTitles = [fbRow1, fbRow9] } else{
 			fbRow.add(labelIcon);
 			fbRow.add(labelTitle);
 			menuName[user.topic_users[c].topic.id] = user.topic_users[c].topic.number;
-			if (user.topic_users[c].topic.entity_id == Titanium.App.Properties.getString("moodle_entity_id")){
+			moodle_entity_string = "moodle_entity_" + user.topic_users[c].topic.entity_id;
+			moodle_url_string = "moodle_url_" + user.topic_users[c].topic.entity_id;
+			if (user.topic_users[c].topic.entity_id == Titanium.App.Properties.getString(moodle_entity_string)){
 				fbRow.moodle = true;
 				labelTitle.moodle = true;
 				labelIcon.moodle = true;
-				menuMoodle[user.topic_users[c].topic.id] = true;
+				menuMoodle[user.topic_users[c].topic.id] = Titanium.App.Properties.getString(moodle_url_string);
 			}
 			fbRow.add(labelTitle);
             menuTitles.push(fbRow);
         }
         menuTitles.push(fbRow8);
         menuTitles.push(fbRow6);
-   if(Titanium.App.Properties.getString("moodle_entity_id") != null)
+   if(Titanium.App.Properties.getString("moodle_entity_2") != null)
    {
 		menuTitles.push(fbRow10);
 		}
@@ -236,23 +238,26 @@ function redirectAfterLogin() {
         Ti.API.info("Push notification device token is: "+deviceToken);
         Ti.API.info("Push notification types: "+Titanium.Network.remoteNotificationTypes);
         Ti.API.info("Push notification enabled: "+Titanium.Network.remoteNotificationsEnabled);
- 
-        var request = Titanium.Network.createHTTPClient();
-        request.onload = function()
-        {
-            
-        };
+        var env = 'development';
+ 		if(Ti.App.Properties.getString('production')=='true'){
+ 			env = 'production'
+ 		}
         var postData = {'user_device': {'token': escape(e.deviceToken),
 						'model' : escape(Titanium.Platform.model),
 						'os': escape(Titanium.Platform.osname),
-						'name': escape(Titanium.Platform.model)}
+						'name': escape(Titanium.Platform.model),
+						'environment': env}
 		};
-		request = postRegisterDevice(Titanium.App.Properties.getString("mmat"),postData)
+        request = postRegisterDevice(Titanium.App.Properties.getString("mmat"),postData);
+        request.onload = function()
+        {
+
+        };
 		request.send(JSON.stringify(postData));
 	},
   		  error:function(e)
    			 {
-   			     alert(e.error);
+   			
  
    			 },
   		  callback:function(e)
@@ -567,9 +572,12 @@ Titanium.Facebook.addEventListener('login', function(e) {
 			for (i=0;i<user.entity_users.length;i++){
 				if (user.entity_users[i].entity.moodle_url != null)
 				{
-					Titanium.App.Properties.setString("moodle_entity_id",user.entity_users[i].entity.id);
-					Titanium.App.Properties.setString("moodle_url",user.entity_users[i].entity.moodle_url);
-					Titanium.App.Properties.setString("entity_user_id",user.entity_users[i].id);
+					moodle_entity_string = "moodle_entity_" + user.entity_users[i].entity.id;
+					moodle_url_string = "moodle_url_" + user.entity_users[i].entity.id;
+					entity_user_string = "entity_user_" + user.entity_users[i].id;
+					Titanium.App.Properties.setString(moodle_entity_string,user.entity_users[i].entity.id);
+					Titanium.App.Properties.setString(moodle_url_string,user.entity_users[i].entity.moodle_url);
+					Titanium.App.Properties.setString(entity_user_string,user.entity_users[i].id);
 				}	
 			}
 			Titanium.App.Properties.setString("name",user.name);

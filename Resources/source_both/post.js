@@ -443,8 +443,66 @@ xhr.onload = function(){
 				height:20,
 			});
 			commentHolder.add(commentSpacer);
-           if (post.post_attachments.length > 0)
+			if (post.post_attachments.length > 0)
 			{
+			if(post.post_attachments[0].name == "capturedvideo.MOV")
+			{
+				 var movieModal = Ti.UI.createWindow({
+        backgroundColor : '#00000000',
+        barColor: '#46a546',
+        title: 'Video',
+        orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+
+});
+
+
+				var activeMovie = Ti.Media.createVideoPlayer({
+    backgroundColor: '#000',
+    fullscreen: true,
+    scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
+    mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
+    url: 'http://s3.amazonaws.com/mindsmesh/production/post_attachments/files/000/000/010/original/IMG_0097.MOV?1361944606',
+    autoplay: false
+});
+//				 var thumbImage = activeMovie.thumbnailImageAtTime(0,Ti.Media.VIDEO_TIME_OPTION_NEAREST_KEYFRAME);
+ //   var movPict = Titanium.UI.createImageView({
+//				image: thumbImage,
+//				top: 5,
+//				left: 5,
+//				box: true,
+/////				height: 'auto',
+//				width: 75,
+//			});
+			var playButton = Titanium.UI.createImageView({
+				image: '../images/LH2-Play-icon-2.png',
+				top: -85,
+				left: 25,
+				height: 32,
+				zIndex: 1,
+				box: true,
+				width: 32,
+			});
+//			movPict.addEventListener('click', function(e){
+//				win.navGroup.open(movieModal,{animated:false});
+///				movieModal.add(activeMovie);
+//			activeMovie.addEventListener('fullscreen', function(e){
+ //   			if (e.entering == 0) {
+ ////      				 win.navGroup.close(movieModal);
+ //   			};
+//			});
+//			});
+			playButton.addEventListener('click', function(e){
+				win.navGroup.open(movieModal,{animated:false});
+				movieModal.add(activeMovie);
+			activeMovie.addEventListener('fullscreen', function(e){
+    			if (e.entering == 0) {
+    				win.navGroup.close(movieModal);
+    			};
+			}); 
+			});
+	//		commentHolder.add(movPict);
+			commentHolder.add(playButton);
+			} else {
 					var view = Titanium.UI.createLabel({
 						height: 25,
 						width: 'auto',
@@ -558,6 +616,7 @@ xhr.onload = function(){
  						winModalFiles.close();}
  					})
             	});
+            	}
 			}
 			fbRow.add(commentHolder);
 			var seperatorPhone = Ti.UI.createView({

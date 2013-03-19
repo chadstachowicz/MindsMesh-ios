@@ -33,6 +33,7 @@ var winModal = Ti.UI.createWindow({
 			{
 				var win1 = Titanium.UI.createWindow({  
     			url:'post.js',
+    			navGroup: win.navGroup,
     			backgroundColor:'#ecfaff',
     			barColor: '#46a546',
     			notModal: winModal

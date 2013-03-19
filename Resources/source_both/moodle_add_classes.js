@@ -31,14 +31,14 @@ var user = '';
 
 var postData = {username: Titanium.App.Properties.getString('moodle-user'), password: Titanium.App.Properties.getString('moodle-pass')};
 //xhr = postLoginToMoodle("http://elondev.mrooms3.net/login/index.php",postData);
-xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url"),postData);
+xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url_2"),postData);
 xhr.onload = function(){
 	var response = this.responseText;
 var regexSess = /Your\ssession\shas/;
 var regexSess2 = /your\slogin\ssession/;
 			var regexLog = /Invalid\slogin/;
 			if(response.match(regexSess2)) {
-				xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url"),postData);
+				xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url_2"),postData);
 				xhr.onload = function(){
 					var response2 = this.responseText;
 					populateWizard(response2);
@@ -193,7 +193,7 @@ Titanium.App.addEventListener('iterateAdd', function(e)
 					});
 					createClass.addEventListener('click', function(e)
 					{
-						var postData = {'topic': {'entity_user_id': Titanium.App.Properties.getString('entity_user_id'),
+						var postData = {'topic': {'entity_user_2': Titanium.App.Properties.getString('entity_user_2'),
 						'title' :ta2.value, 'number': Importrows[currentImport][1] + ' ' + Importrows[currentImport][2]}};
 						xhr = postTopicCreate(Titanium.App.Properties.getString('mmat'),postData);
 						xhr.onload = function(){
@@ -435,7 +435,7 @@ if (checker == true){
 	alert('You must select at least one class to run the wizard.');
 }
 });
-var dialogBox = Titanium.UI.createAlertDialog({title: 'Import Wizard', message: 'Please select the classes from Moodle that are current or you would like to discuss through Minds Mesh.', buttonNames: 'OK'});
+var dialogBox = Titanium.UI.createAlertDialog({title: 'Import Wizard', message: 'Please select the classes from Moodle that are current or you would like to discuss through Minds Mesh.', buttonNames: ["OK"]});
 dialogBox.show();
 function populateWizard(response){
 //	var regex = /(http.+course\/view\.php\?id=\d+)">([\w\d\s:-]+)<\/a><\/p>/ig;

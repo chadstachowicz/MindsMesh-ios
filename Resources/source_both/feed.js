@@ -1,11 +1,34 @@
 Ti.include("model/api.js");
 var offset = 0;
 var data = [];
+var f;
+var currentFile = '';
 var win = Titanium.UI.currentWindow;
+var t1 = Ti.UI.create3DMatrix();
+t1 = t1.rotate(180,0,1,0);
 var shareWhoModal = Ti.UI.createWindow({
         backgroundColor : '#B0000000',
          zIndex: 1
     });
+         shareWhoModal.addEventListener('click', function(e){
+			 if(e.source.box != true){
+			 	
+			 	
+			 	var dlg = Titanium.UI.createAlertDialog({
+			 	box: true,
+    			message:'If you exit your content will be lost from this post, is that ok?', 
+    			buttonNames: ['Yes','Cancel']
+  			});
+   			dlg.addEventListener('click', function(ev) {
+   				 if (ev.index == 0) { 
+   				 	shareWhoModal.close();
+   				 } else if (ev.index == 1) { // clicked "No"
+					dlg.hide();
+   				 }
+ 			 });
+ 			 dlg.show();
+ 				}
+ 			});
 var shareModal = Ti.UI.createWindow({
         backgroundColor : '#B0000000',
         visible: false,
@@ -61,8 +84,6 @@ Titanium.Media.showCamera({
 
   success:function(event)
   {
-  	//var t1 = Ti.UI.create3DMatrix();
-//	t1 = t1.rotate(180,0,1,0);
         var cameraView = Ti.UI.createImageView({
             width: 320,
             height: 480,
@@ -106,7 +127,7 @@ Titanium.Media.showCamera({
     var a = Titanium.UI.createAlertDialog({title:'Camera'});
     if (error.code == Titanium.Media.NO_CAMERA)
     {
-      a.setMessage('Lancia questa applicazione dal telefono');
+      a.setMessage('Sorry this device does not have a camera.');
     }
     else
     {
@@ -137,6 +158,7 @@ Titanium.Media.showCamera({
 		{
 			var activeMovie = Titanium.Media.createVideoPlayer({
 				backgroundColor:'#111',
+				transform:t1,
 				mediaControlStyle:Titanium.Media.VIDEO_CONTROL_DEFAULT,
 				scalingMode:Titanium.Media.VIDEO_SCALING_ASPECT_FILL,
 				//contentURL:movieFile.nativePath
@@ -158,25 +180,6 @@ Titanium.Media.showCamera({
 
 				success:function(event)
 				{
-     shareWhoModal.addEventListener('click', function(e){
-			 if(e.source.box != true){
-			 	
-			 	
-			 	var dlg = Titanium.UI.createAlertDialog({
-			 	box: true,
-    			message:'If you exit your content will be lost from this post, is that ok?', 
-    			buttonNames: ['Yes','Cancel']
-  			});
-   			dlg.addEventListener('click', function(ev) {
-   				 if (ev.index == 0) { 
-   				 	shareWhoModal.close();
-   				 } else if (ev.index == 1) { // clicked "No"
-					dlg.hide();
-   				 }
- 			 });
- 			 dlg.show();
- 				}
- 			});
         	var win_height = 380;
    		var win_width = Ti.Platform.displayCaps.platformWidth * .85;
  
@@ -300,20 +303,33 @@ ta1.addEventListener('blur',function(e){
 				picker_view.hide();
 			});
 			done.addEventListener('click', function(){
-				var postData = {'post':{'topic_user_id': selectedId, 'text' :ta1.value}, 'file': event.media.toBlob()};
+				var postData = {'topic_user_id': picker.getSelectedRow(0).topic_user_id, 'text' :ta1.value, 'filename': 'post.mov'};
 				xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
+				var pb = Ti.UI.createProgressBar({zIndex:50,width:250,
+    				height:'auto',
+   					 min:0,
+   					 max:1,
+   				 value:0,
+   				 bottom: 10,
+   				 message:'Uploading File',
+    			color:'#333',
+    			font:{fontSize:14, fontWeight:'bold'},
+   				 style:Titanium.UI.iPhone.ProgressBarStyle.PLAIN});
+				win.add(pb);
+				pb.show();
 				xhr.onload = function(){
-					var response = this.responseText;
-					var test = JSON.parse(response);
-					if (win.source == 'class_feed'){
-						Titanium.App.fireEvent('event_three',{data:'posted'});
-					} else {
-						Titanium.App.fireEvent('event_one',{data:'posted'});
+					var post_id = JSON.parse(this.responseText).id;
+					f = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'post.mov');
+					if(f.exists() == true)
+					{
+						f.deleteFile();
 					}
-					win.navGroup.close(win);
+					f.write(currentFile);
+					alert("test");
+					s3upload((post_id + '/post.mov'),f,function(e){alert('something')});
 
 				};
-				xhr.send(JSON.stringify(postData));
+				xhr.send(postData);
 				picker_view.hide();
 				shareWhoModal.close();
 			});
@@ -393,6 +409,8 @@ movieModal.addEventListener('close', function(e){
     media: event.media,
     autoplay: false
 });
+currentFile = event.media;
+
 
     var thumbImage = activeMovie.thumbnailImageAtTime(0,Ti.Media.VIDEO_TIME_OPTION_NEAREST_KEYFRAME);
     var movPict = Titanium.UI.createImageView({
@@ -468,7 +486,7 @@ movieModal.addEventListener('close', function(e){
 					a.show();
 				},
 				mediaTypes: Titanium.Media.MEDIA_TYPE_VIDEO,
-				videoMaximumDuration:10000,
+				videoMaximumDuration:20000,
 				videoQuality:Titanium.Media.QUALITY_HIGH,
 			});
 
@@ -568,6 +586,7 @@ var winModal = Ti.UI.createWindow({
 			{
 				var win1 = Titanium.UI.createWindow({  
     			url:'post.js',
+    			navGroup: win.navGroup,
     			backgroundColor:'#ecfaff',
     			barColor: '#46a546',
     			notModal: winModal
