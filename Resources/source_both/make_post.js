@@ -119,6 +119,7 @@ win.add(ta1);
 var pickerSelected = 0;
 var timesfired = 0;
 var data = [];
+if(win.topic_id != null){
 xhr = getUserWithChildren(Titanium.App.Properties.getString('mmat'),Titanium.App.Properties.getString('userid'));
 xhr.onload = function(){
 	var response = this.responseText;
@@ -192,40 +193,60 @@ picker.addEventListener('focus', function(e){
 	my_combo.blur();
 	my_combo.enabled = false;
 });
-win.addEventListener('focus', function(e){
-	ta1.focus();
-});
-ta1.focus();
-
 }
 
 xhr.send();
-
-
+}
+win.addEventListener('focus', function(e){
+	ta1.focus();
+});
 btnPost.addEventListener('click', function(e){
-		if(ta1.value.length < 10)
+		if(ta1.value.length >= 5)
 		{
-			alert("Your post must be at least 10 characters");
-		} else if (pickerSelected == 0)
-		{
-			alert("Please select a class before posting");
-		} else {
-		var postData = {'post':{'topic_user_id': selectedId, 'text' :ta1.value}};
-		xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
-		xhr.onload = function(){
-			var response = this.responseText;
-			var test = JSON.parse(response);
-			if (win.source == 'class_feed'){
-				Titanium.App.fireEvent('event_three',{data:'posted'});
-			} else {
-				Titanium.App.fireEvent('event_one',{data:'posted'});
-			}
-			win.navGroup.close(win);
+			if (win.topic == true){
+				if (pickerSelected == 0) {
+					alert("Please select a class before posting");
+				} else {
+					var postData = {'topic_user_id': selectedId, 'text': ta1.value};
+					xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
+			xhr.onload = function(){
+				var response = this.responseText;
+				var test = JSON.parse(response);
+				if (win.source == 'class_feed'){
+					Titanium.App.fireEvent('event_three',{data:'posted'});
+				} else {
+					Titanium.App.fireEvent('event_one',{data:'posted'});
+				}
+				win.navGroup.close(win);
 
-		};
-		xhr.send(JSON.stringify(postData));
+			};
+			xhr.send(postData);
+					
+				}
+				
+			} else {
+				var postData = {'text': ta1.value};
+				xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
+			xhr.onload = function(){
+				var response = this.responseText;
+				alert(response);
+				var test = JSON.parse(response);
+				if (win.source == 'class_feed'){
+					Titanium.App.fireEvent('event_three',{data:'posted'});
+				} else {
+					Titanium.App.fireEvent('event_one',{data:'posted'});
+				}
+				win.navGroup.close(win);
+
+			};
+			xhr.send(postData);
+				
+			}
+		} else {
+			alert("A reasonable post should have at least 5 chars.")
+		}
+			
 		
-	}
 });
 
 

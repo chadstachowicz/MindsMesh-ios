@@ -1,21 +1,22 @@
-/**
-*
-*  UTF-8 data encode / decode
-*  http://www.webtoolkit.info/
-*
-**/
- 
-var Utf8 = {
- 
+/*
+ * A Titanium Mobile commonJS module for UTF-8 data encode / decode
+ * http://www.webtoolkit.info/javascript-utf8.html
+ *
+ * Contributors: Terry Martin
+ * Copyright: Semantic Press, Inc.
+*/
+
+var _OBJ = {
+
 	// public method for url encoding
 	encode : function (string) {
 		string = string.replace(/\r\n/g,"\n");
 		var utftext = "";
- 
+
 		for (var n = 0; n < string.length; n++) {
- 
+
 			var c = string.charCodeAt(n);
- 
+
 			if (c < 128) {
 				utftext += String.fromCharCode(c);
 			}
@@ -28,22 +29,22 @@ var Utf8 = {
 				utftext += String.fromCharCode(((c >> 6) & 63) | 128);
 				utftext += String.fromCharCode((c & 63) | 128);
 			}
- 
+
 		}
- 
+
 		return utftext;
 	},
- 
+
 	// public method for url decoding
 	decode : function (utftext) {
 		var string = "";
 		var i = 0;
 		var c = c1 = c2 = 0;
- 
+
 		while ( i < utftext.length ) {
- 
+
 			c = utftext.charCodeAt(i);
- 
+
 			if (c < 128) {
 				string += String.fromCharCode(c);
 				i++;
@@ -59,10 +60,14 @@ var Utf8 = {
 				string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
 				i += 3;
 			}
- 
+
 		}
- 
+
 		return string;
 	}
- 
-}
+
+};
+
+exports.load = function() {
+	return _OBJ;
+};

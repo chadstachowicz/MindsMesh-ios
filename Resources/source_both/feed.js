@@ -1,497 +1,786 @@
 Ti.include("model/api.js");
+var AWS = require('modules/amazon').load();
 var offset = 0;
 var data = [];
 var f;
 var currentFile = '';
 var win = Titanium.UI.currentWindow;
-var t1 = Ti.UI.create3DMatrix();
-t1 = t1.rotate(180,0,1,0);
-var shareWhoModal = Ti.UI.createWindow({
-        backgroundColor : '#B0000000',
-         zIndex: 1
-    });
-         shareWhoModal.addEventListener('click', function(e){
-			 if(e.source.box != true){
-			 	
-			 	
-			 	var dlg = Titanium.UI.createAlertDialog({
-			 	box: true,
-    			message:'If you exit your content will be lost from this post, is that ok?', 
-    			buttonNames: ['Yes','Cancel']
-  			});
-   			dlg.addEventListener('click', function(ev) {
-   				 if (ev.index == 0) { 
-   				 	shareWhoModal.close();
-   				 } else if (ev.index == 1) { // clicked "No"
-					dlg.hide();
-   				 }
- 			 });
- 			 dlg.show();
- 				}
- 			});
-var shareModal = Ti.UI.createWindow({
-        backgroundColor : '#B0000000',
-        visible: false,
-       
-    });
-     shareModal.addEventListener('click', function(e){
-			 if(e.source.box != true){
- 				shareModal.hide();}
- 			})
-        	var win_height = 380;
-   		var win_width = Ti.Platform.displayCaps.platformWidth * .85;
- 
-    	var view = Ti.UI.createView({
-        	backgroundColor : '#e2e7ed',
-        	borderColor : '#A5A5A5',
-        	box: true,
-        	borderRadius : 15,
-        	top: 50,
-        	layout: 'vertical',
-        	borderWidth : 2,
-        	width : win_width,
-        	height : win_height
-   		 });
-   		 
-   		var messageButton = Ti.UI.createButton({
-    		title: 'Message',
-   			toggle:false,
-    		height: 30,
-    		width:200,
-			top: 10
-		});
-		messageButton.addEventListener('click', function(e){
-			var win1 = Titanium.UI.createWindow({  
-				title: 'Message',
-				navGroup: win.navGroup,
-    			url:'make_post.js',
-    			backgroundColor:'#ecfaff',
-    			barColor: '#46a546',
-    			});
-    			win.navGroup.open(win1,{animated:false});
-		})
-		
-		var photoButton = Ti.UI.createButton({
-    		title: 'Photo',
-   			 toggle:false,
-    		height: 30,
-    		width:200,
-
-			top: 10
-		});
-		photoButton.addEventListener('click', function(e){
-Titanium.Media.showCamera({
-
-  success:function(event)
-  {
-        var cameraView = Ti.UI.createImageView({
-            width: 320,
-            height: 480,
-            top: 0,
-            left: 0,
-            image: event.media,
-        });
-     //   cameraView.transform = t1;
-        var imageNew = cameraView.toImage(function(e){
-            //Save Image
-            var filename1 = Titanium.Filesystem.applicationDataDirectory + "/NAMEOFTHEPICTURE.png";
-           f = Titanium.Filesystem.getFile(filename1);
-            f.write(e.blob);
-          Titanium.Media.saveToPhotoGallery(f);
-      //     Titanium.Media.hideCamera();
-            //alert('my media' + event.media.width);
-        });
-        var thumbCameraView = Ti.UI.createImageView({
-            width: 150,
-            height: 225,
-            top: 0,
-            left: 0,
-            image: event.media,
-			transform: t1
-        });
-      //  thumbCameraView.add(thumbOverImage);
-      //  win.add(thumbCameraView);
-        	if (shareWhoModal.visible == true)
-				{
-					shareWhoModal.show();	
-				} else {
-					shareWhoModal.open();
-				}
-				shareWhoModal.visible = true;
-  },
-  cancel:function()
-  {
-  },
-  error:function(error)
-  {
-    var a = Titanium.UI.createAlertDialog({title:'Camera'});
-    if (error.code == Titanium.Media.NO_CAMERA)
-    {
-      a.setMessage('Sorry this device does not have a camera.');
-    }
-    else
-    {
-      a.setMessage('Errore: ' + error.code);
-    }
-    a.show();
-  },
- // overlay:overImage,
-  showControls:true,
-  mediaTypes:Ti.Media.MEDIA_TYPE_PHOTO,
-    saveToPhotoGallery:false,
-    allowEditing: true,
-    allowImageEditing:true,
+if (win.topic_id != null)
+{
+	if (win.moodle != null){
+var btnBar = Ti.UI.createButtonBar({
+    labels:['Share','Moodle'],
+    backgroundColor:'#46a546',
 });
-		})
-		
-		var videoButton = Ti.UI.createButton({
-    		title: 'Video',
-   			 toggle:false,
-    		height: 30,
-    		width:200,
-
-			top: 10
-		});
-		videoButton.addEventListener('click', function(e){
-		var record = true
-		if (record == false)
-		{
-			var activeMovie = Titanium.Media.createVideoPlayer({
-				backgroundColor:'#111',
-				transform:t1,
-				mediaControlStyle:Titanium.Media.VIDEO_CONTROL_DEFAULT,
-				scalingMode:Titanium.Media.VIDEO_SCALING_ASPECT_FILL,
-				//contentURL:movieFile.nativePath
-				media:movieFile			// note you can use either contentURL to nativePath or the file object
-			});
-			activeMovie.play();
-
-			activeMovie.addEventListener('complete', function()
-			{
-				movieFile.deleteFile();
-				record = true;
-			});
-
-				win.add(activeMovie);
-		}
-		else
-		{
-			Titanium.Media.showCamera({
-
-				success:function(event)
-				{
-        	var win_height = 380;
-   		var win_width = Ti.Platform.displayCaps.platformWidth * .85;
- 
-    	var view = Ti.UI.createView({
-        	backgroundColor : '#e2e7ed',
-        	borderColor : '#A5A5A5',
-        	box: true,
-        	borderRadius : 15,
-        	top: 50,
-        	layout: 'vertical',
-        	borderWidth : 2,
-        	width : win_width,
-        	height : win_height
-   		 });
-   		 var btnDone = Ti.UI.createButton({title:'Done'});
-   		 var ta1 = Titanium.UI.createTextArea({
-			editable: true,
-	top:-81,
-	left:82,
-	box: true,
-	height: 134,
-	value: "Enter a Message!",
-	width: (Titanium.Platform.displayCaps.platformWidth - 130),
-	color:'#000',
-	textAlign:'left',
-	appearance:Titanium.UI.KEYBOARD_APPEARANCE_ALERT,	
-	suppressReturn:false,
-	keyboardToolbar: [btnDone]
+} else {
+	var btnBar = Ti.UI.createButtonBar({
+    labels:['Share'],
+    backgroundColor:'#46a546',
 });
-   		 btnDone.addEventListener('click', function(e){
-   		 	ta1.blur();
-   		 });
-ta1._hintText = ta1.value;
+}
+btnBar.addEventListener('click', function(e) {
+  if (e.index == 0 ){
+    	shareModal.open();
+		shareModal.visible = true;
+  } else if (e.index == 1) {
+  	if (Titanium.App.Properties.hasProperty('moodle-user') == false || Titanium.App.Properties.hasProperty('moodle-user') == 0 || Titanium.App.Properties.hasProperty('moodle-pass') == false || Titanium.App.Properties.hasProperty('moodle-pass') == 0)
+  	{
+  		
+  		var win1 = Titanium.UI.createWindow({  
+    	title:'Moodle Account',
+   	 	url:'moodle_account.js',
+   	 	navGroup: win.navGroup,
+   	 	class_id: win.topic_id,
+   	 	backgroundColor:'#ecfaff',
+   	 	layout:'absolute',
+   	 	barColor: '#46a546'
+   	});
+   	win.navGroup.open(win1,{animated:false});
+  	} else {
+
  
-ta1.addEventListener('focus',function(e){
-    if(e.source.value == e.source._hintText){
-        e.source.value = "";
-    }
-});
-ta1.addEventListener('blur',function(e){
-    if(e.source.value==""){
-        e.source.value = e.source._hintText;
-    }
-});
-   		var friendButton = Ti.UI.createButton({
-    		title: 'Friend(s)',
-   			toggle:false,
-    		height: 30,
-    		width:200,
-    		box: true,
-			top: 10
-		});
-		friendButton.addEventListener('click', function(e){
-			var win1 = Titanium.UI.createWindow({  
-				title: 'Message',
-				navGroup: win.navGroup,
-    			url:'make_post.js',
-    			backgroundColor:'#ecfaff',
-    			barColor: '#46a546',
-    			});
-    			win.navGroup.open(win1,{animated:false});
-		})
-		
-		var campusButton = Ti.UI.createButton({
-    		title: 'Everyone',
-   			 toggle:false,
-    		height: 30,
-    		width:200,
-			box: true,
-			top: 10
-		});
-		
-		var classButton = Ti.UI.createButton({
-    		title: 'Class',
-   			 toggle:false,
-    		height: 30,
-    		width:200,
-			box: true,
-			top: 10
-		});
-		classButton.addEventListener('click', function(e){
-			
-			xhr = getUserWithChildren(Titanium.App.Properties.getString('mmat'),Titanium.App.Properties.getString('userid'));
-			xhr.onload = function(){
-				var response = this.responseText;
-				var user = JSON.parse(response);
-				for(c=0;c<user.topic_users.length;c++){
-            		data[c]=Ti.UI.createPickerRow({title:user.topic_users[c].topic.name,topic_user_id:user.topic_users[c].id});
-       			 }
-       			// turn on the selection indicator (off by default)
-			var picker = Ti.UI.createPicker({
-				bottom: 0,
-				width: Titanium.UI.FILL
-			});
-			var picker_view = Titanium.UI.createView({
-				height:251,
-				zIndex: 25,
-				bottom:0
-			});
- 
-			var cancel =  Titanium.UI.createButton({
-				title:'Cancel',
-				style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-			});
- 
-			var done =  Titanium.UI.createButton({
-				title:'Finish',
-				style:Titanium.UI.iPhone.SystemButtonStyle.DONE
-			});
- 
-			var spacer =  Titanium.UI.createButton({
-				systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
-			});
- 
-			var toolbar =  Titanium.UI.createToolbar({
-				top:0,
-				height: 51,
-				items:[cancel,spacer,done]
-			});
-			cancel.addEventListener('click',function() {
-				picker_view.hide();
-			});
-			done.addEventListener('click', function(){
-				var postData = {'topic_user_id': picker.getSelectedRow(0).topic_user_id, 'text' :ta1.value, 'filename': 'post.mov'};
-				xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
-				var pb = Ti.UI.createProgressBar({zIndex:50,width:250,
-    				height:'auto',
-   					 min:0,
-   					 max:1,
-   				 value:0,
-   				 bottom: 10,
-   				 message:'Uploading File',
-    			color:'#333',
-    			font:{fontSize:14, fontWeight:'bold'},
-   				 style:Titanium.UI.iPhone.ProgressBarStyle.PLAIN});
-				win.add(pb);
-				pb.show();
+	loadView.add(loadIndicator);
+	loadView.open();
+	loadIndicator.show();
+  	var postData = {username: Titanium.App.Properties.getString('moodle-user'), password: Titanium.App.Properties.getString('moodle-pass')};	
+  	xhr = postLoginToMoodle(win.moodle,postData);
+	xhr.onload = function(){
+		var response = this.responseText;
+var regexSess = /Your\ssession\shas/i;
+var regexSess2 = /your\slogin\ssession/i;
+			var regexLog = /Invalid\slogin/i;
+			if(response.match(regexSess2)) {
+				xhr = postLoginToMoodle(win.moodle,postData);
 				xhr.onload = function(){
-					var post_id = JSON.parse(this.responseText).id;
-					f = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'post.mov');
-					if(f.exists() == true)
-					{
-						f.deleteFile();
-					}
-					f.write(currentFile);
-					alert("test");
-					s3upload((post_id + '/post.mov'),f,function(e){alert('something')});
-
+					var response2 = this.responseText;
+					redirectToMoodle(response2);
 				};
 				xhr.send(postData);
-				picker_view.hide();
-				shareWhoModal.close();
-			});
+			} else if(response.match(regexLog)) {
+				alert('These are not valid credentials.  Please correct them.');
+			} else {
+				redirectToMoodle(response);
+
+	}
+	}
+	xhr.send(postData);
+	}
+  } 
+});
+win.setRightNavButton(btnBar);
+
+  	var loadView = Ti.UI.createWindow({
+    	backgroundColor: 'black',
+    	opacity: .90,
+    	height: Ti.Platform.displayCaps.platformHeight,
+    	width: Ti.Platform.displayCaps.platformWidth
+	});
+ 
+	var loadIndicator = Ti.UI.createActivityIndicator({
+    	style: Ti.UI.iPhone.ActivityIndicatorStyle.BIG,
+    	message: 'Loading Moodle...',
+    	font : 'Arial',
+    	color: '#FFF'
+	});
+} else {
+	var btnPost = Titanium.UI.createButton({
+	title:'Share',
+});
+btnPost.addEventListener('click', function(e){
+				shareModal.open();
+				shareModal.visible = true;
+});
+win.setRightNavButton(btnPost);
+}
+
+var shareWhoModal = Ti.UI.createWindow(
+{
+    backgroundColor : '#B0000000',
+    zIndex: 1
+});
+shareWhoModal.addEventListener('click', function(e)
+{
+	if(e.source.box != true)
+	{
+		var dlg = Titanium.UI.createAlertDialog(
+		{
+			box: true,
+    		message:'If you exit your content will be lost from this post, is that ok?', 
+    		buttonNames: ['Yes','Cancel']
+  		});
+   		dlg.addEventListener('click', function(ev) 
+   		{
+   			if (ev.index == 0)
+   			{ 
+   				shareWhoModal.close();
+   			} else if (ev.index == 1) { // clicked "No"
+				dlg.hide();
+   			}
+ 		});
+ 		dlg.show();
+ 	}
+});
+var shareModal = Ti.UI.createWindow(
+{
+	backgroundColor : '#B0000000'
+});
+shareModal.addEventListener('click', function(e)
+{
+	if(e.source.box != true)
+	{
+ 		shareModal.close();
+ 	}
+});
+var win_height = 380;
+var win_width = Ti.Platform.displayCaps.platformWidth * .85;
+var view = Ti.UI.createView(
+{
+	backgroundColor : '#e2e7ed',
+    borderColor : '#A5A5A5',
+    box: true,
+    borderRadius : 15,
+    top: 50,
+    layout: 'vertical',
+    borderWidth : 2,
+    width : win_width,
+    height : win_height
+});
+var messageButton = Ti.UI.createButton(
+{
+	title: 'Message',
+    toggle:false,
+    height: 30,
+    width:200,
+	top: 10
+});
+messageButton.addEventListener('click', function(e)
+{
+	var win1 = Titanium.UI.createWindow(
+	{  
+		title: 'Message',
+		navGroup: win.navGroup,
+    	url:'make_post.js',
+    	topic_id: win.topic_id,
+    	backgroundColor:'#ecfaff',
+    	barColor: '#46a546',
+    });
+    win.navGroup.open(win1,{animated:false});
+});
+var photoButton = Ti.UI.createButton({
+    title: 'Photo',
+   	toggle:false,
+    height: 30,
+    width:200,
+    top: 10
+});
+photoButton.addEventListener('click', function(e)
+{
+	Titanium.Media.showCamera(
+	{
+		success:function(event)
+  		{
+  			
+  			var win_height = 380;
+   				var win_width = Ti.Platform.displayCaps.platformWidth * .85;
+ 				var view = Ti.UI.createView(
+    			{
+        			backgroundColor : '#e2e7ed',
+        			borderColor : '#A5A5A5',
+        			box: true,
+        			borderRadius : 15,
+        			top: 50,
+        			layout: 'vertical',
+        			borderWidth : 2,
+        			width : win_width,
+        			height : win_height
+   		 		});
+   		 		var btnDone = Ti.UI.createButton({title:'Done'});
+   		 		var ta1 = Titanium.UI.createTextArea({
+					editable: true,
+					top:-95,
+					left:77,
+					box: true,
+					height: 95,
+					value: "Enter a message!",
+					width: (Titanium.Platform.displayCaps.platformWidth - 130),
+					color:'#000',
+					textAlign:'left',
+					appearance:Titanium.UI.KEYBOARD_APPEARANCE_ALERT,	
+					suppressReturn:false,
+					keyboardToolbar: [btnDone]
+				});
+   		 		btnDone.addEventListener('click', function(e)
+   		 		{
+   		 			ta1.blur();
+   		 		});
+				ta1._hintText = ta1.value;
+				ta1.addEventListener('focus',function(e)
+				{
+    				if(e.source.value == e.source._hintText)
+    				{
+        				e.source.value = "";
+    				}
+				});
+				ta1.addEventListener('blur',function(e)
+				{
+    				if(e.source.value=="")
+    				{
+        				e.source.value = e.source._hintText;
+    				}
+				});
+				var finishButton = Ti.UI.createButton({
+    				title: 'Finish',
+   			 		toggle:false,
+    				height: 30,
+    				width:200,
+					box: true,
+					top: 10
+				});
+				finishButton.addEventListener('click', function(e)
+				{
 			
-			picker.SelectionIndicator = true;
-			picker.add(data);
-			picker_view.add(toolbar);
-			picker_view.add(picker);
-			shareWhoModal.add(picker_view);
-			picker.show();
-		}
-		xhr.send();
-});
-	
-		
+							var postData = {'text': ta1.value, 'filename': 'post.png', 'content_type': currentFile.mimeType};
+							xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
+							var pb = Ti.UI.createProgressBar({
+								zIndex:50,
+								width:250,
+    							height:'auto',
+   					 			min:0,
+   					 			max:1,
+   				 				value:0,
+   								top: 0,
+   				 				message:'Uploading File',
+    							color:'#333',
+    							font:{fontSize:14, fontWeight:'bold'},
+   				 				style:Titanium.UI.iPhone.ProgressBarStyle.PLAIN
+   				 			});
+							win.add(pb);
+							pb.show();
+							xhr.onload = function()
+							{
+								var post_id = JSON.parse(this.responseText).id;
+								f = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'post.png');
+								if(f.exists() == true)
+								{
+									f.deleteFile();
+								}
+								var imageView = Titanium.UI.createImageView({
+            						image:currentFile,
+            						 width:480,
+           							 height:640
+        						});
+        						image = imageView.toImage();
+								f.write(image);
+								var env = 'development';
+ 								if(Ti.App.Properties.getString('production')=='true')
+ 								{
+ 									env = 'production'
+ 								}
+ 								var filnam = env + '/post_attachments/' + post_id + '/post.png';
 
+								AWS.config(
+								{
+    								key: 'AKIAIKFVJ3EMAIBXELBQ',
+    								secret: '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',
+    								bucket: 'mindsmesh.com',
+   									GSM:' -0700',
+    								debug:true,
+    								http: Titanium.Network.createHTTPClient(),
+    								s3fileName: filnam,
+    								timeout: (1000 * 60 * 4),
+    								onsendstream: function(e) {pb.value = e.progress;},
+   									error: function(e) {alert(e)},
+   									success: function(e) 
+   									{
+   										f.deleteFile();
+										pb.hide();	
+   								
+   									}
+								});
+								AWS.PUT('post.png');
 
-		   		 var labelTitle = Titanium.UI.createLabel({
-    			text:Titanium.App.Properties.getString("name"),
-    			font:{fontSize:16,fontWeight:'bold'},
-    			color:'#000',
-    			box: true,
-   				width:'auto',
-    			textAlign:'center',
-    			top: -37,
-    			left: 55,
- 
-			});
-			var labelTitle2 = Titanium.UI.createLabel({
-    			text:'Add a message and share',
-    			font:{fontSize:12},
-    			color:'#000',
-    			box: true,
-   				width:'auto',
-    			textAlign:'center',
-    			left: 55,
- 
-			});
-		var seperatorPhone = Ti.UI.createView({
-				backgroundColor: "#808080",
-				width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 10,
-				top: 7,
-				box: true,
-				height:2,
-			});
-			var pict = Titanium.UI.createImageView({
-				image: Titanium.App.Properties.getString("photo_url"),
-				top: 10,
-				left: 10,
-				box:true,
-				height:40,
-				width:40,
-			});
+							};
+							xhr.send(postData);
+							shareWhoModal.close();
+				});
+				var labelTitle = Titanium.UI.createLabel({
+    				text:Titanium.App.Properties.getString("name"),
+    				font:{fontSize:16,fontWeight:'bold'},
+    				color:'#000',
+    				box: true,
+   					width:'auto',
+    				textAlign:'center',
+    				top: -37,
+    				left: 55,
+				});
+				var labelTitle2 = Titanium.UI.createLabel({
+    				text:'Add a message and share',
+    				font:{fontSize:12},
+    				color:'#000',
+    				box: true,
+   					width:'auto',
+    				textAlign:'center',
+    				left: 55
+				});
+				var seperatorPhone = Ti.UI.createView({
+					backgroundColor: "#808080",
+					width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 10,
+					top: 7,
+					box: true,
+					height:2,
+				});
+				var pict = Titanium.UI.createImageView({
+					image: Titanium.App.Properties.getString("photo_url"),
+					top: 10,
+					left: 10,
+					box:true,
+					height:40,
+					width:40,
+				});
 
-			 view.add(pict);
-		 view.add(labelTitle);
-		 view.add(labelTitle2);
-		 view.add(seperatorPhone);
-
-
-
-				 var movieModal = Ti.UI.createWindow({
-        backgroundColor : '#00000000',
-        barColor: '#46a546',
-        title: 'Video',
-        orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
-
-});
-movieModal.addEventListener('close', function(e){
-	shareWhoModal.show();
-});
-	var activeMovie = Ti.Media.createVideoPlayer({
-    backgroundColor: '#000',
-    fullscreen: true,
-    scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
-    mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
-    media: event.media,
-    autoplay: false
-});
-currentFile = event.media;
-
-
-    var thumbImage = activeMovie.thumbnailImageAtTime(0,Ti.Media.VIDEO_TIME_OPTION_NEAREST_KEYFRAME);
-    var movPict = Titanium.UI.createImageView({
-				image: thumbImage,
-				top: 5,
-				left: 5,
-				box: true,
-				height: 'auto',
-				width: 75,
-			});
-			var playButton = Titanium.UI.createImageView({
-				image: '../images/LH2-Play-icon-2.png',
-				top: -85,
-				left: 25,
-				height: 32,
-				zIndex: 1,
-				box: true,
-				width: 32,
-			});
-			movPict.addEventListener('click', function(e){
-				win.navGroup.open(movieModal,{animated:false});
-				movieModal.add(activeMovie);
-				shareWhoModal.hide();
-			activeMovie.addEventListener('fullscreen', function(e){
-    			if (e.entering == 0) {
-       				 win.navGroup.close(movieModal);
-    			};
-			});
-			});
-			playButton.addEventListener('click', function(e){
-				win.navGroup.open(movieModal,{animated:false});
-				movieModal.add(activeMovie);
-				shareWhoModal.hide();
-			activeMovie.addEventListener('fullscreen', function(e){
-    			if (e.entering == 0) {
-    				win.navGroup.close(movieModal);
-    			};
-			}); 
-			});
-			view.add(movPict);
-			view.add(playButton);
-
-
-		view.add(ta1);
-		 view.add(friendButton);
-		 view.add(campusButton);
-		 view.add(classButton);
-   		 shareWhoModal.add(view);
-   		 shareWhoModal.open();
-   		 
-				record = false;
-				},
-				cancel:function()
+				view.add(pict);
+				view.add(labelTitle);
+				view.add(labelTitle2);
+				view.add(seperatorPhone);
+				var picModal = Ti.UI.createWindow({
+        			backgroundColor : 'black',
+        			barColor: '#46a546',
+        			title: 'Picture',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+				});
+				picModal.addEventListener('close', function(e)
 				{
-
-				},
-				error:function(error)
+					shareWhoModal.show();
+				});
+				currentFile = event.media;
+    			var movPict = Titanium.UI.createImageView({
+					image: currentFile,
+					top: 5,
+					left: 5,
+					box: true,
+					height: 95,
+					width: 70,
+				});
+				var imgPic = Titanium.UI.createImageView({
+					image: currentFile,
+					box: true
+				});
+				movPict.addEventListener('click', function(e)
 				{
-					// create alert
-					var a = Titanium.UI.createAlertDialog({title:'Video'});
-
-					// set message
-					if (error.code == Titanium.Media.NO_VIDEO)
+					win.navGroup.open(picModal,{animated:false});
+					picModal.add(imgPic);
+					shareWhoModal.hide();
+				});
+				view.add(movPict);
+				view.add(ta1);
+				view.add(finishButton);
+   				shareWhoModal.add(view);
+   				shareWhoModal.open();
+  			
+ 
+ 
+ 
+ 
+ 
+ 
+        	var cameraView = Ti.UI.createImageView({
+            	width: 320,
+            	height: 480,
+            	top: 0,
+            	left: 0,
+            	image: event.media,
+        	});
+        	var imageNew = cameraView.toImage(function(e)
+        	{
+            //Save Image
+            	var filename1 = Titanium.Filesystem.applicationDataDirectory + "/NAMEOFTHEPICTURE.png";
+           		f = Titanium.Filesystem.getFile(filename1);
+            	f.write(e.blob);
+          		Titanium.Media.saveToPhotoGallery(f);
+       		});
+        	var thumbCameraView = Ti.UI.createImageView({
+            	width: 150,
+           	 	height: 225,
+            	top: 0,
+            	left: 0,
+            	image: event.media,
+        	});
+      //  thumbCameraView.add(thumbOverImage);
+      //  win.add(thumbCameraView);
+  		},
+  		cancel:function()
+  		{
+ 		},
+  		error:function(error)
+  		{
+    		var a = Titanium.UI.createAlertDialog({title:'Camera'});
+    		if (error.code == Titanium.Media.NO_CAMERA)
+    		{
+      			a.setMessage('Sorry this device does not have a camera.');
+   	 		}
+    		else
+    		{
+      			a.setMessage('Errore: ' + error.code);
+    		}
+    		a.show();
+  		},
+ 		// overlay:overImage,
+  		showControls:true,
+  		mediaTypes:Ti.Media.MEDIA_TYPE_PHOTO,
+    	saveToPhotoGallery:false,
+    	allowEditing: true,
+    	allowImageEditing:true,
+	});
+});
+var videoButton = Ti.UI.createButton(
+{
+    title: 'Video',
+   	toggle:false,
+    height: 30,
+    width:200,
+	top: 10
+});
+videoButton.addEventListener('click', function(e)
+{
+	var record = true
+	if (record == false)
+	{
+		var activeMovie = Titanium.Media.createVideoPlayer(
+		{
+			backgroundColor:'#111',
+			mediaControlStyle:Titanium.Media.VIDEO_CONTROL_DEFAULT,
+			scalingMode:Titanium.Media.VIDEO_SCALING_ASPECT_FILL,
+			//contentURL:movieFile.nativePath
+			media:movieFile			// note you can use either contentURL to nativePath or the file object
+		});
+		activeMovie.play();
+		activeMovie.addEventListener('complete', function()
+		{
+			movieFile.deleteFile();
+			record = true;
+		});
+		win.add(activeMovie);
+	}
+	else
+	{
+		Titanium.Media.showCamera(
+		{
+			success:function(event)
+			{
+        		var win_height = 380;
+   				var win_width = Ti.Platform.displayCaps.platformWidth * .85;
+ 				var view = Ti.UI.createView(
+    			{
+        			backgroundColor : '#e2e7ed',
+        			borderColor : '#A5A5A5',
+        			box: true,
+        			borderRadius : 15,
+        			top: 50,
+        			layout: 'vertical',
+        			borderWidth : 2,
+        			width : win_width,
+        			height : win_height
+   		 		});
+   		 		var btnDone = Ti.UI.createButton({title:'Done'});
+   		 		var ta1 = Titanium.UI.createTextArea({
+					editable: true,
+					top:-56,
+					left:77,
+					box: true,
+					height: 95,
+					value: "Enter a message!",
+					width: (Titanium.Platform.displayCaps.platformWidth - 130),
+					color:'#000',
+					textAlign:'left',
+					appearance:Titanium.UI.KEYBOARD_APPEARANCE_ALERT,	
+					suppressReturn:false,
+					keyboardToolbar: [btnDone]
+				});
+   		 		btnDone.addEventListener('click', function(e)
+   		 		{
+   		 			ta1.blur();
+   		 		});
+				ta1._hintText = ta1.value;
+				ta1.addEventListener('focus',function(e)
+				{
+    				if(e.source.value == e.source._hintText)
+    				{
+        				e.source.value = "";
+    				}
+				});
+				ta1.addEventListener('blur',function(e)
+				{
+    				if(e.source.value=="")
+    				{
+        				e.source.value = e.source._hintText;
+    				}
+				});
+				var finishButton = Ti.UI.createButton({
+    				title: 'Finish',
+   			 		toggle:false,
+    				height: 30,
+    				width:200,
+					box: true,
+					top: 10
+				});
+				finishButton.addEventListener('click', function(e)
+				{
+					xhr = getUserWithChildren(Titanium.App.Properties.getString('mmat'),Titanium.App.Properties.getString('userid'));
+					xhr.onload = function()
 					{
-						a.setMessage('Device does not have video recording capabilities');
+						var response = this.responseText;
+						var user = JSON.parse(response);
+						for(c=0;c<user.topic_users.length;c++)
+						{
+            				data[c]=Ti.UI.createPickerRow({title:user.topic_users[c].topic.name,topic_id:user.topic_users[c].topic.id});
+       			 		}
+       					// turn on the selection indicator (off by default)
+						var picker = Ti.UI.createPicker({
+							bottom: 0,
+							width: Titanium.UI.FILL
+						});
+						var picker_view = Titanium.UI.createView({
+							height:251,
+							zIndex: 25,
+							bottom:0
+						});
+ 
+						var cancel =  Titanium.UI.createButton({
+							title:'Cancel',
+							style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
+						});
+ 
+						var done =  Titanium.UI.createButton({
+							title:'Finish',
+							style:Titanium.UI.iPhone.SystemButtonStyle.DONE
+						});
+ 
+						var spacer =  Titanium.UI.createButton({
+							systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+						});
+ 
+						var toolbar =  Titanium.UI.createToolbar({
+							top:0,
+							height: 51,
+							items:[cancel,spacer,done]
+						});
+						cancel.addEventListener('click',function() 
+						{
+							picker_view.hide();
+						});
+						done.addEventListener('click', function()
+						{
+							var postData = {'topic_id': picker.getSelectedRow(0).topic_id, 'text': ta1.value, 'filename': 'post.mov', 'content_type': currentFile.mimeType};
+							xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
+							var pb = Ti.UI.createProgressBar({
+								zIndex:50,
+								width:250,
+    							height:'auto',
+   					 			min:0,
+   					 			max:1,
+   				 				value:0,
+   								top: 0,
+   				 				message:'Uploading File',
+    							color:'#333',
+    							font:{fontSize:14, fontWeight:'bold'},
+   				 				style:Titanium.UI.iPhone.ProgressBarStyle.PLAIN
+   				 			});
+							win.add(pb);
+							pb.show();
+							xhr.onload = function()
+							{
+								var post_id = JSON.parse(this.responseText).id;
+								f = Titanium.Filesystem.getFile(Titanium.Filesystem.applicationDataDirectory,'post.mov');
+								if(f.exists() == true)
+								{
+									f.deleteFile();
+								}
+								f.write(currentFile);
+								var env = 'development';
+ 								if(Ti.App.Properties.getString('production')=='true')
+ 								{
+ 									env = 'production'
+ 								}
+ 								var filnam = env + '/post_attachments/' + post_id + '/post.mov';
+
+								AWS.config(
+								{
+    								key: 'AKIAIKFVJ3EMAIBXELBQ',
+    								secret: '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',
+    								bucket: 'mindsmesh.com',
+   									GSM:' -0700',
+    								debug:true,
+    								http: Titanium.Network.createHTTPClient(),
+    								s3fileName: filnam,
+    								timeout: (1000 * 60 * 4),
+    								onsendstream: function(e) {pb.value = e.progress;},
+   									error: function(e) {alert(e)},
+   									success: function(e) 
+   									{
+   										f.deleteFile();
+    									var postData = {'file': 'http://s3.amazonaws.com/mindsmesh.com/' + filnam};
+										xhr2 = postEncodeVideo(Titanium.App.Properties.getString('mmat'),postData);
+ 										xhr2.onload = function()
+ 										{
+											pb.hide();	
+										};
+										xhr2.send(JSON.stringify(postData));
+   								
+   									}
+								});
+								AWS.PUT('post.mov');
+
+							};
+							xhr.send(postData);
+							picker_view.hide();
+							shareWhoModal.close();
+						});
+						picker.SelectionIndicator = true;
+						picker.add(data);
+						picker_view.add(toolbar);
+						picker_view.add(picker);
+						shareWhoModal.add(picker_view);
+						picker.show();
 					}
-					else
+					xhr.send();
+				});
+				var labelTitle = Titanium.UI.createLabel({
+    				text:Titanium.App.Properties.getString("name"),
+    				font:{fontSize:16,fontWeight:'bold'},
+    				color:'#000',
+    				box: true,
+   					width:'auto',
+    				textAlign:'center',
+    				top: -37,
+    				left: 55,
+				});
+				var labelTitle2 = Titanium.UI.createLabel({
+    				text:'Add a message and share',
+    				font:{fontSize:12},
+    				color:'#000',
+    				box: true,
+   					width:'auto',
+    				textAlign:'center',
+    				left: 55
+				});
+				var seperatorPhone = Ti.UI.createView({
+					backgroundColor: "#808080",
+					width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 10,
+					top: 7,
+					box: true,
+					height:2,
+				});
+				var pict = Titanium.UI.createImageView({
+					image: Titanium.App.Properties.getString("photo_url"),
+					top: 10,
+					left: 10,
+					box:true,
+					height:40,
+					width:40,
+				});
+
+				view.add(pict);
+				view.add(labelTitle);
+				view.add(labelTitle2);
+				view.add(seperatorPhone);
+				var movieModal = Ti.UI.createWindow({
+        			backgroundColor : '#00000000',
+        			barColor: '#46a546',
+        			title: 'Video',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+				});
+				movieModal.addEventListener('close', function(e)
+				{
+					shareWhoModal.show();
+				});
+				var activeMovie = Ti.Media.createVideoPlayer({
+    				backgroundColor: '#000',
+    				fullscreen: true,
+    				scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
+    				mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
+    				media: event.media,
+    				autoplay: false
+				});
+				currentFile = event.media;
+				var thumbImage = activeMovie.thumbnailImageAtTime(0,Ti.Media.VIDEO_TIME_OPTION_NEAREST_KEYFRAME);
+    			var movPict = Titanium.UI.createImageView({
+					image: thumbImage,
+					top: 5,
+					left: 5,
+					box: true,
+					height: 95,
+					width: 70,
+				});
+				var playButton = Titanium.UI.createImageView({
+					image: '../images/LH2-Play-icon-2.png',
+					top: -70,
+					left: 25,
+					height: 32,
+					zIndex: 1,
+					box: true,
+					width: 32,
+				});
+				movPict.addEventListener('click', function(e)
+				{
+					win.navGroup.open(movieModal,{animated:false});
+					movieModal.add(activeMovie);
+					shareWhoModal.hide();
+					activeMovie.addEventListener('fullscreen', function(e)
 					{
-						a.setMessage('Unexpected error: ' + error.code);
-					}
+    					if (e.entering == 0) 
+    					{
+       						win.navGroup.close(movieModal);
+    					};
+					});
+				});
+				playButton.addEventListener('click', function(e)
+				{
+					win.navGroup.open(movieModal,{animated:false});
+					movieModal.add(activeMovie);
+					shareWhoModal.hide();
+					activeMovie.addEventListener('fullscreen', function(e)
+					{
+    					if (e.entering == 0) {
+    						win.navGroup.close(movieModal);
+    					};
+					}); 
+				});
+				view.add(movPict);
+				view.add(playButton);
+				view.add(ta1);
+				view.add(finishButton);
+   				shareWhoModal.add(view);
+   				shareWhoModal.open();
+   				record = false;
+			},
+			cancel:function()
+			{
 
-					// show alert
-					a.show();
-				},
-				mediaTypes: Titanium.Media.MEDIA_TYPE_VIDEO,
-				videoMaximumDuration:20000,
-				videoQuality:Titanium.Media.QUALITY_HIGH,
-			});
+			},
+			error:function(error)
+			{
+				// create alert
+				var a = Titanium.UI.createAlertDialog({title:'Video'});
 
-		}
-		})
+				// set message
+				if (error.code == Titanium.Media.NO_VIDEO)
+				{
+					a.setMessage('Device does not have video recording capabilities');
+				}
+				else
+				{
+					a.setMessage('Unexpected error: ' + error.code);
+				}
+
+				// show alert
+				a.show();
+			},
+			mediaTypes: Titanium.Media.MEDIA_TYPE_VIDEO,
+			videoMaximumDuration:15000,
+			videoQuality:Titanium.Media.QUALITY_MEDIUM,
+		});
+	}
+});
 		
 		var voiceButton = Ti.UI.createButton({
     		title: 'Voice',
@@ -547,7 +836,7 @@ currentFile = event.media;
 		 view.add(messageButton);
 		 view.add(photoButton);
 		 view.add(videoButton);
-		 view.add(voiceButton);
+	//	 view.add(voiceButton);
    		 shareModal.add(view);
 
 
@@ -597,7 +886,7 @@ var winModal = Ti.UI.createWindow({
 			winModal.hide();
 			win.navGroup.open(win1,{animated:false});
 			} else if (e.source.type == "Topic"){
-				Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, class_id: e.source.id});
+				Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, topic_id: e.source.id});
 			}
 	}
 	xhr.send();
@@ -881,22 +1170,8 @@ xhr.send()
 win.add(tableView);
 var brainlabel = [];
 
-var btnPost = Titanium.UI.createButton({
-	title:'Share',
-});
-if(Titanium.Platform.osname == 'iphone' || Titanium.Platform.osname == 'ipad'){
-win.setRightNavButton(btnPost);
-}
 
-btnPost.addEventListener('click', function(e){
-				if (shareModal.visible == true)
-				{
-					shareModal.show();	
-				} else {
-					shareModal.open();
-				}
-				shareModal.visible = true;
-});
+
 var lastRow = 0;
 
 var border = Ti.UI.createView({
@@ -1016,7 +1291,11 @@ function endReloading()
 	var rd = []; tableView.data = rd;
 	lastRow = 0;
 	lastRowId = 1;
-    xhr = getPostsWithFamily(Titanium.App.Properties.getString('mmat'));
+	if(win.topic_id != null){
+		xhr = getTopicPostsWithFamily(Titanium.App.Properties.getString("mmat"),win.topic_id)
+	} else {
+		xhr = getPostsWithFamily(Titanium.App.Properties.getString('mmat'));
+	}
     xhr.onload = function(){
     	onLoad(this.responseText);
     };
@@ -1125,7 +1404,11 @@ function endUpdate()
 {
 	actInd2.hide();
 	tableView.deleteRow(lastRow,{animationStyle:Titanium.UI.iPhone.RowAnimationStyle.NONE});
-	xhr = getPostsWithFamily(Titanium.App.Properties.getString('mmat'),lastRowId);
+	if(win.topic_id != null){
+		xhr = getTopicPostsWithFamily(Titanium.App.Properties.getString("mmat"),win.topic_id,lastRowId)
+	} else {
+		xhr = getPostsWithFamily(Titanium.App.Properties.getString('mmat'),lastRowId);
+	}
 	xhr.onload = function(){
     	onLoad(this.responseText);
     };
@@ -1484,19 +1767,39 @@ if (Titanium.Platform.osname == "iphone"){
    };
    Ti.Gesture.addEventListener('orientationchange',function(e){
         win.width = Titanium.Platform.displayCaps.platformWidth;
- //       if (Titanium.Platform.osname == "iphone"){
- //       for(c=0;c<g;c++){
- //       	commentHolder[c].width = Titanium.Platform.displayCaps.platformWidth - 10;
- //       	backHolder[c].width = Titanium.Platform.displayCaps.platformWidth - 10;
- //       	seperatorPhone[c].width = Titanium.Platform.displayCaps.platformWidth - 10;
-  //      	comment[c].width = Titanium.Platform.displayCaps.platformWidth - 30;
- ///       }
-  //      } else {
-  //      	for(c=0;c<g;c++){
-  //      	commentHolder[c].width = Titanium.Platform.displayCaps.platformWidth - 30;
-  //      	backHolder[c].width = Titanium.Platform.displayCaps.platformWidth - 30;
-   //     	seperatorPhone[c].width = Titanium.Platform.displayCaps.platformWidth - 30;
- //       	comment[c].width = Titanium.Platform.displayCaps.platformWidth - 60;
- //       }
- //       }
+
    });
+   
+   
+   function redirectToMoodle(response){
+	var regex = /TreeNode\('([\w\d\s:-]+)'.+(http.+course\/view\.php\?id=\d+)/ig;
+	var totalFound = []
+	var totalURL = [];
+	while((hits = regex.exec(response)) !== null) {
+		var regex2 = /([a-zA-Z]+)-([\d\w]+)/i;
+    	var found = regex2.exec(hits[1]);
+    	if( found != null){	
+        	if ((found[1] + ' ' + found[2]) == win.class_number){
+        		totalFound.push(found);
+        		totalURL.push(hits[2]);
+        	}
+       }
+    }
+	loadView.close();
+    if (totalFound.length == 0) {
+		alert("No Moodle Course found for this discussion.  Make sure course Numbers between MindsMesh.com and Moodle match exactly, and that you are a part of the class on your schools Moodle.");
+	} else if ( totalFound.length == 1){
+		var win1 = Titanium.UI.createWindow({  
+    			url:'moodle_class.js',
+    			navGroup: win.navGroup,
+    			backgroundColor:'#ecfaff',
+    			barColor: '#46a546'
+			});
+			win1.Moodurl = totalURL[0];
+			win.navGroup.open(win1,{animated:false});
+	} else {
+		
+	}
+};
+   
+   				

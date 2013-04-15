@@ -344,6 +344,7 @@ xhr.send()
 					var win1 = Titanium.UI.createWindow({  
     					title:'Got a Question?',
    	 					url:'make_post.js',
+   	 					topic: true,
    	 					source: 'class_feed',
    	 					navGroup: win.navGroup,
    	 					backgroundColor:'#ecfaff',
@@ -365,6 +366,7 @@ btnBar.addEventListener('click', function(e) {
     	title:'Got a Question?',
    	 	url:'make_post.js',
    	 	source: 'class_feed',
+   	 	topic: true,
    	 	navGroup: win.navGroup,
    	 	backgroundColor:'#ecfaff',
    	 	layout:'absolute',

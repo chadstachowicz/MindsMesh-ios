@@ -464,15 +464,15 @@ xhr.onload = function(){
     url: 'http://s3.amazonaws.com/mindsmesh/production/post_attachments/files/000/000/010/original/IMG_0097.MOV?1361944606',
     autoplay: false
 });
-//				 var thumbImage = activeMovie.thumbnailImageAtTime(0,Ti.Media.VIDEO_TIME_OPTION_NEAREST_KEYFRAME);
- //   var movPict = Titanium.UI.createImageView({
-//				image: thumbImage,
-//				top: 5,
-//				left: 5,
-//				box: true,
-/////				height: 'auto',
-//				width: 75,
-//			});
+				 var thumbImage = activeMovie.thumbnailImageAtTime(0,Ti.Media.VIDEO_TIME_OPTION_NEAREST_KEYFRAME);
+   var movPict = Titanium.UI.createImageView({
+				image: thumbImage,
+				top: 5,
+				left: 5,
+				box: true,
+				height: 'auto',
+				width: 75,
+			});
 			var playButton = Titanium.UI.createImageView({
 				image: '../images/LH2-Play-icon-2.png',
 				top: -85,
@@ -482,15 +482,15 @@ xhr.onload = function(){
 				box: true,
 				width: 32,
 			});
-//			movPict.addEventListener('click', function(e){
-//				win.navGroup.open(movieModal,{animated:false});
-///				movieModal.add(activeMovie);
-//			activeMovie.addEventListener('fullscreen', function(e){
- //   			if (e.entering == 0) {
- ////      				 win.navGroup.close(movieModal);
- //   			};
-//			});
-//			});
+			movPict.addEventListener('click', function(e){
+				win.navGroup.open(movieModal,{animated:false});
+				movieModal.add(activeMovie);
+			activeMovie.addEventListener('fullscreen', function(e){
+    			if (e.entering == 0) {
+       				 win.navGroup.close(movieModal);
+    			};
+			});
+			});
 			playButton.addEventListener('click', function(e){
 				win.navGroup.open(movieModal,{animated:false});
 				movieModal.add(activeMovie);
@@ -500,7 +500,7 @@ xhr.onload = function(){
     			};
 			}); 
 			});
-	//		commentHolder.add(movPict);
+			commentHolder.add(movPict);
 			commentHolder.add(playButton);
 			} else {
 					var view = Titanium.UI.createLabel({

@@ -1,4 +1,5 @@
 Ti.include("source_both/model/api.js");
+Titanium.App.idleTimerDisabled = true;
 var win = Titanium.UI.createWindow({  
     title:'Please Login to Minds Mesh',
     backgroundColor:'#ecfaff',
@@ -114,6 +115,30 @@ var labelTitle = Titanium.UI.createLabel({
 			});
 fbRow8.add(labelIcon);
 fbRow8.add(labelTitle);
+var fbRow11 = Titanium.UI.createTableViewRow({
+                backgroundColor:'#252525',
+                id: 8,
+				height:40
+            });
+var labelTitle = Titanium.UI.createLabel({
+    			text:'Add Group....',
+    			id: 8,
+    			font:{fontSize:16},
+    			color:'#e2e7ed',
+   				width:'auto',
+    			textAlign:'left',
+    			left: 45
+			});
+			var labelIcon = Titanium.UI.createImageView({
+				image: 'images/emblem_library.png',
+				id: 8,
+				left: 4,
+				top: 4,
+				height:32,
+				width:32,
+			});
+fbRow11.add(labelIcon);
+fbRow11.add(labelTitle);
 var fbRow9 = Titanium.UI.createTableViewRow({
                 backgroundColor:'#252525',
                 id: 9,
@@ -215,6 +240,44 @@ menuTitles = [fbRow1, fbRow9] } else{
             menuTitles.push(fbRow);
         }
         menuTitles.push(fbRow8);
+        for(c=0;c<user.group_users.length;c++){
+            var fbRow = Titanium.UI.createTableViewRow({
+                backgroundColor:'#252525',
+                id: 2,
+				height:40,
+				moodle: false,
+				extraData: user.group_users[c].group.id
+            });
+            
+            if (c==0){fbRow.header = 'Groups'}
+			var labelTitle = Titanium.UI.createLabel({
+    			text:user.group_users[c].group.name,
+    			font:{fontSize:16},
+    			id: 2,
+    			color:'#e2e7ed',
+   				width:'auto',
+    			textAlign:'left',
+    			left: 45,
+    			moodle: false,
+                extraData: user.group_users[c].group.id
+			});
+			var labelIcon = Titanium.UI.createImageView({
+				image: 'images/emblem_library.png',
+				id: 7,
+				left: 4,
+				top: 4,
+				height:32,
+				width:32,
+				moodle: false,
+                extraData: user.group_users[c].group.id
+			});
+			fbRow.add(labelIcon);
+			fbRow.add(labelTitle);
+			menuName[user.group_users[c].group.id] = user.group_users[c].group.name;
+			fbRow.add(labelTitle);
+            menuTitles.push(fbRow);
+        }
+        menuTitles.push(fbRow11);
         menuTitles.push(fbRow6);
    if(Titanium.App.Properties.getString("moodle_entity_2") != null)
    {
@@ -350,8 +413,6 @@ menuTableView.addEventListener('click', function(e)
 {
 	if (e.source.id == 1){
      Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:1});
-   } else if (e.source.id == 2){
-     Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:2});
    } else if (e.source.id == 4){
      Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:4});
    } else if (e.source.id == 5){
@@ -359,7 +420,9 @@ menuTableView.addEventListener('click', function(e)
    } else if (e.source.id == 6){
      Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:6});
    } else if (e.source.id == 7){
-     Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, class_id: e.source.extraData});
+     Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, topic_id: e.source.extraData});
+   } else if (e.source.id == 2){
+     Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, topic_id: e.source.extraData});
    } else if (e.source.id == 8){
      Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:8});
    } else if (e.source.id == 9){
@@ -391,12 +454,12 @@ Titanium.App.addEventListener('loadTopic', function(e)
 	var win7 = Titanium.UI.createWindow({  
     			navGroup: navGroup,
    	    		backgroundColor:'#46a546',
-    			url:'source_both/topic_feed.js',
+    			url:'source_both/feed.js',
     			barColor: '#46a546',
     			moving:false, // Custom property for movement
        			axis:0 // Custom property for X axis
 	});
-				win7.class_id = class_id;
+				win7.topic_id = topic_id;
 				win7.moodle = moodle;
 				win7.class_number = class_number;
 				navGroup.open(win7,{animated:false});
@@ -417,9 +480,9 @@ Titanium.App.addEventListener('nav-menu-button', function(e)
 {
         // If the menu is opened
     var menu_id = e.menu_id;
-    var class_id = e.class_id;
-    var moodle = menuMoodle[class_id];
-    var class_number = menuName[class_id];
+    var topic_id = e.topic_id;
+    var moodle = menuMoodle[topic_id];
+    var class_number = menuName[topic_id];
     if(e.data == true){
         var navAnimate = Ti.UI.createAnimation({
             left:0,
@@ -434,18 +497,6 @@ Titanium.App.addEventListener('nav-menu-button', function(e)
     				barColor: '#46a546',
     				navGroup: navGroup,
    	    			backgroundColor:"#46a546",
-       				moving:false, // Custom property for movement
-       				axis:0 // Custom property for X axis
-    			 });
-        		navGroup.open(win2,{animated:false});
-				Titanium.App.fireEvent('main-win-close');
-			} else if(menu_id == 2) {
-        	 	var win2 = Titanium.UI.createWindow({  
-    				title:'Classes',
-   					url:'source_both/topics.js',
-    				barColor: '#46a546',
-    				navGroup: navGroup,
-   	    			backgroundColor:"#e2e7ed",
        				moving:false, // Custom property for movement
        				axis:0 // Custom property for X axis
     			 });
@@ -498,14 +549,27 @@ Titanium.App.addEventListener('nav-menu-button', function(e)
 				var win7 = Titanium.UI.createWindow({  
     			navGroup: navGroup,
    	    		backgroundColor:'#46a546',
-    			url:'source_both/topic_feed.js',
+    			url:'source_both/feed.js',
     			barColor: '#46a546',
     			moving:false, // Custom property for movement
        			axis:0 // Custom property for X axis
 				});
-				win7.class_id = class_id;
+				win7.topic_id = topic_id;
 				win7.moodle = moodle;
 				win7.class_number = class_number;
+				navGroup.open(win7,{animated:false});
+				Titanium.App.fireEvent('main-win-close');
+			} else if(menu_id == 2) {
+				var win7 = Titanium.UI.createWindow({  
+    			navGroup: navGroup,
+   	    		backgroundColor:'#46a546',
+    			url:'source_both/feed.js',
+    			barColor: '#46a546',
+    			moving:false, // Custom property for movement
+       			axis:0 // Custom property for X axis
+				});
+				win7.group_id = group_id;
+				win7.group_name = group_name;
 				navGroup.open(win7,{animated:false});
 				Titanium.App.fireEvent('main-win-close');
 			} else if(menu_id == 8) {
