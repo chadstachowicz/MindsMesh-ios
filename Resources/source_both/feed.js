@@ -147,7 +147,7 @@ var view = Ti.UI.createView(
 });
 var messageButton = Ti.UI.createButton(
 {
-	title: 'Message',
+	title: 'Status',
     toggle:false,
     height: 30,
     width:200,
@@ -155,12 +155,21 @@ var messageButton = Ti.UI.createButton(
 });
 messageButton.addEventListener('click', function(e)
 {
+					if(win.topic_id != null)
+					{
+						var title = win.class_number;
+					} else if (win.group_id != null) {		
+						var title = win.group_name;
+					} else {					
+						var title = "Status";
+					}
 	var win1 = Titanium.UI.createWindow(
 	{  
-		title: 'Message',
+		title: title,
 		navGroup: win.navGroup,
     	url:'make_post.js',
     	topic_id: win.topic_id,
+    	group_id: win.group_id,
     	backgroundColor:'#ecfaff',
     	barColor: '#46a546',
     });
@@ -238,8 +247,18 @@ photoButton.addEventListener('click', function(e)
 				});
 				finishButton.addEventListener('click', function(e)
 				{
-			
-							var postData = {'text': ta1.value, 'filename': 'post.png', 'content_type': currentFile.mimeType};
+					if (ta1.value == "Enter a message!")
+					{
+						ta1.value = "";
+					}
+					if(win.topic_id != null)
+					{
+						var postData = {'topic_id': win.topic_id, 'text': ta1.value, 'filename': 'post.png', 'content_type': currentFile.mimeType};
+					} else if (win.group_id != null) {		
+						var postData = {'group_id': win.group_id, 'text': ta1.value, 'filename': 'post.png', 'content_type': currentFile.mimeType};
+					} else {					
+						var postData = {'text': ta1.value, 'filename': 'post.png', 'content_type': currentFile.mimeType};
+					}
 							xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
 							var pb = Ti.UI.createProgressBar({
 								zIndex:50,
@@ -420,7 +439,7 @@ photoButton.addEventListener('click', function(e)
    	 		}
     		else
     		{
-      			a.setMessage('Errore: ' + error.code);
+      			a.setMessage('Error: ' + error.code);
     		}
     		a.show();
   		},
@@ -525,52 +544,19 @@ videoButton.addEventListener('click', function(e)
 				});
 				finishButton.addEventListener('click', function(e)
 				{
-					xhr = getUserWithChildren(Titanium.App.Properties.getString('mmat'),Titanium.App.Properties.getString('userid'));
-					xhr.onload = function()
+					if (ta1.value == "Enter a message!")
 					{
-						var response = this.responseText;
-						var user = JSON.parse(response);
-						for(c=0;c<user.topic_users.length;c++)
-						{
-            				data[c]=Ti.UI.createPickerRow({title:user.topic_users[c].topic.name,topic_id:user.topic_users[c].topic.id});
-       			 		}
-       					// turn on the selection indicator (off by default)
-						var picker = Ti.UI.createPicker({
-							bottom: 0,
-							width: Titanium.UI.FILL
-						});
-						var picker_view = Titanium.UI.createView({
-							height:251,
-							zIndex: 25,
-							bottom:0
-						});
- 
-						var cancel =  Titanium.UI.createButton({
-							title:'Cancel',
-							style:Titanium.UI.iPhone.SystemButtonStyle.BORDERED
-						});
- 
-						var done =  Titanium.UI.createButton({
-							title:'Finish',
-							style:Titanium.UI.iPhone.SystemButtonStyle.DONE
-						});
- 
-						var spacer =  Titanium.UI.createButton({
-							systemButton:Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
-						});
- 
-						var toolbar =  Titanium.UI.createToolbar({
-							top:0,
-							height: 51,
-							items:[cancel,spacer,done]
-						});
-						cancel.addEventListener('click',function() 
-						{
-							picker_view.hide();
-						});
-						done.addEventListener('click', function()
-						{
-							var postData = {'topic_id': picker.getSelectedRow(0).topic_id, 'text': ta1.value, 'filename': 'post.mov', 'content_type': currentFile.mimeType};
+						ta1.value = "";
+					}
+
+					if(win.topic_id != null)
+					{
+						var postData = {'topic_id': win.topic_id, 'text': ta1.value, 'filename': 'post.mov', 'content_type': currentFile.mimeType};
+					} else if (win.group_id != null) {		
+						var postData = {'group_id': win.group_id, 'text': ta1.value, 'filename': 'post.mov', 'content_type': currentFile.mimeType};
+					} else {					
+						var postData = {'text': ta1.value, 'filename': 'post.mov', 'content_type': currentFile.mimeType};
+					}
 							xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
 							var pb = Ti.UI.createProgressBar({
 								zIndex:50,
@@ -632,17 +618,7 @@ videoButton.addEventListener('click', function(e)
 
 							};
 							xhr.send(postData);
-							picker_view.hide();
 							shareWhoModal.close();
-						});
-						picker.SelectionIndicator = true;
-						picker.add(data);
-						picker_view.add(toolbar);
-						picker_view.add(picker);
-						shareWhoModal.add(picker_view);
-						picker.show();
-					}
-					xhr.send();
 				});
 				var labelTitle = Titanium.UI.createLabel({
     				text:Titanium.App.Properties.getString("name"),
@@ -1153,6 +1129,8 @@ xhr.send()
 			if(menuButton.toggle == true){
 				Titanium.App.fireEvent('nav-menu-button',{data:true});
 				tableView.scrollable = true;
+			} else if (e.source.box == true){
+
 			} else {
 				var win1 = Titanium.UI.createWindow({  
     			url:'post.js',
@@ -1293,11 +1271,14 @@ function endReloading()
 	lastRowId = 1;
 	if(win.topic_id != null){
 		xhr = getTopicPostsWithFamily(Titanium.App.Properties.getString("mmat"),win.topic_id)
+	} else if(win.group_id != null){
+		xhr = getGroupPostsWithFamily(Titanium.App.Properties.getString("mmat"),win.group_id)
 	} else {
 		xhr = getPostsWithFamily(Titanium.App.Properties.getString('mmat'));
 	}
     xhr.onload = function(){
     	onLoad(this.responseText);
+    	
     };
 	xhr.send();
 
@@ -1406,6 +1387,8 @@ function endUpdate()
 	tableView.deleteRow(lastRow,{animationStyle:Titanium.UI.iPhone.RowAnimationStyle.NONE});
 	if(win.topic_id != null){
 		xhr = getTopicPostsWithFamily(Titanium.App.Properties.getString("mmat"),win.topic_id,lastRowId)
+	} else if(win.group_id != null){
+		xhr = getGroupPostsWithFamily(Titanium.App.Properties.getString("mmat"),win.group_id,lastRowId)
 	} else {
 		xhr = getPostsWithFamily(Titanium.App.Properties.getString('mmat'),lastRowId);
 	}
@@ -1503,11 +1486,17 @@ function onLoad(response){
                 layout:'vertical'
 
             });
+            var rowtext = "";
+			if(post.topic != null){
+				rowtext = fullname + " asked " + post.topic.number;
+			} else if(post.group != null){
+				rowtext = fullname + " posted in " + post.group.name;
+			} else {
+				rowtext = fullname;
+			}
 if (Titanium.Platform.osname == "iphone"){
-	
-	
             var fbName = Titanium.UI.createLabel({
-                text: fullname + " asked " + post.topic.number,
+                text: rowtext,
                 backgroundColor:'#ecfaff',
 				textAlign:'left',
 				left:55,
@@ -1580,7 +1569,7 @@ if (Titanium.Platform.osname == "iphone"){
 
 			} else {
 				var fbName = Titanium.UI.createLabel({
-                text: fullname + " asked " + post.topic.number,
+                text: rowtext,
                 backgroundColor:'#ecfaff',
 		textAlign:'left',
 		left:80,
@@ -1688,7 +1677,101 @@ if (Titanium.Platform.osname == "iphone"){
 			});
 			if (post.post_attachments.length > 0)
 			{
+				var myRegEx = /\.png$/i;
+			if(post.post_attachments[0].name == "post.mov")
+			{
+				var url = post.post_attachments[0].url;
+				var pieces = url.substring(0, url.length - 8);
+  	 			var movPict = Titanium.UI.createImageView({
+					image: (pieces + "frame_0000.png"),
+					box: true,
+					height: 'auto',
+					width: 200,
+					url: url,
+					bottom: 5
+				});
+				var playButton = Titanium.UI.createImageView({
+					image: '../images/LH2-Play-icon-2.png',
+					top: -150,
+					height: 32,
+					zIndex: 1,
+					box: true,
+					url: url,
+					width: 32,
+				});
+				movPict.addEventListener('click', function(e){
+					var movieModal2 = Ti.UI.createWindow({
+        		 	backgroundColor : '#00000000',
+        			barColor: '#46a546',
+        			title: 'Video',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
 
+				});
+				var activeMovie = Ti.Media.createVideoPlayer({
+    				backgroundColor: '#000',
+    				scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
+    				mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
+    				url: e.source.url,
+    				autoplay: false
+				});
+					win.navGroup.open(movieModal2,{animated:false});
+					movieModal2.add(activeMovie);
+					activeMovie.addEventListener('fullscreen', function(e){
+    				
+       				 		win.navGroup.close(movieModal2);
+    				
+					});
+				});
+				playButton.addEventListener('click', function(e){
+				var movieModal2 = Ti.UI.createWindow({
+        		 	backgroundColor : '#00000000',
+        			barColor: '#46a546',
+        			title: 'Video',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+
+				});
+									var activeMovie = Ti.Media.createVideoPlayer({
+    				backgroundColor: '#000',
+    				scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
+    				mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
+    				url: e.source.url,
+    				autoplay: false
+				});
+					win.navGroup.open(movieModal2,{animated:false});
+					movieModal2.add(activeMovie);
+					activeMovie.addEventListener('fullscreen', function(e){
+    					
+    						win.navGroup.close(movieModal2);
+    					
+					}); 
+				});
+				commentHolder[g].add(movPict);
+				commentHolder[g].add(playButton);
+			} else if (post.post_attachments[0].name.match(myRegEx)) {
+				var url = post.post_attachments[0].url;
+				var imgPic = Titanium.UI.createImageView({
+					image: post.post_attachments[0].url,
+					box: true,
+					height: 'auto',
+					url: url,
+					width: 200,
+					bottom: 20
+				});
+				imgPic.addEventListener('click', function(e){
+					var picModal2 = Ti.UI.createWindow({
+        			backgroundColor : 'black',
+        			barColor: '#46a546',
+        			title: 'Picture',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+				});
+				var imgPic2 = Titanium.UI.createImageView({
+					image: e.source.url,
+				});
+					win.navGroup.open(picModal2,{animated:false});
+					picModal2.add(imgPic2);
+				});
+				commentHolder[g].add(imgPic);
+			} else {
 					var attach = Titanium.UI.createLabel({
             		text: (post.post_attachments.length + ' file(s) attached'),
 					height: 'auto',
@@ -1706,6 +1789,7 @@ if (Titanium.Platform.osname == "iphone"){
 				});
 				backHolder[g].add(paperclip);
             	backHolder[g].add(attach);
+            }
 			}
 			seperatorPhone[g] = Ti.UI.createView({
 				backgroundColor: "#808080",
@@ -1723,7 +1807,102 @@ if (Titanium.Platform.osname == "iphone"){
 			});
 			if (post.post_attachments.length > 0)
 			{
+				var myRegEx = /\.png$/i;
+			if(post.post_attachments[0].name == "post.mov")
+			{
+				var url = post.post_attachments[0].url;
+				var pieces = url.substring(0, url.length - 8);
+  	 			var movPict = Titanium.UI.createImageView({
+					image: (pieces + "frame_0000.png"),
+					box: true,
+					height: 'auto',
+					url: post.post_attachments[0].url,
+					width: 200,
+					bottom: 5
+				});
+				var playButton = Titanium.UI.createImageView({
+					image: '../images/LH2-Play-icon-2.png',
+					top: -150,
+					height: 32,
+					url: post.post_attachments[0].url,
+					zIndex: 1,
+					box: true,
+					width: 32,
+				});
+				
+				movPict.addEventListener('click', function(e){
+				var movieModal2 = Ti.UI.createWindow({
+        		 	backgroundColor : '#00000000',
+        			barColor: '#46a546',
+        			title: 'Video',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
 
+				});
+				var activeMovie = Ti.Media.createVideoPlayer({
+    				backgroundColor: '#000',
+    				scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
+    				mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
+    				url: e.source.url,
+    				autoplay: false
+				});
+					win.navGroup.open(movieModal2,{animated:false});
+					movieModal2.add(activeMovie);
+					activeMovie.addEventListener('fullscreen', function(e){
+    				
+       				 		win.navGroup.close(movieModal2);
+    				
+					});
+				});
+				playButton.addEventListener('click', function(e){
+				var movieModal2 = Ti.UI.createWindow({
+        		 	backgroundColor : '#00000000',
+        			barColor: '#46a546',
+        			title: 'Video',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+
+				});
+				var activeMovie = Ti.Media.createVideoPlayer({
+    				backgroundColor: '#000',
+    				scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
+    				mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
+    				url: e.source.url,
+    				autoplay: false
+				});
+					win.navGroup.open(movieModal2,{animated:false});
+					movieModal2.add(activeMovie);
+					activeMovie.addEventListener('fullscreen', function(e){
+    				
+    						win.navGroup.close(movieModal2);
+    					
+					}); 
+				});
+				commentHolder[g].add(movPict);
+				commentHolder[g].add(playButton);
+			} else if (post.post_attachments[0].name.match(myRegEx)) {
+				var url = post.post_attachments[0].url;
+				var imgPic = Titanium.UI.createImageView({
+					image: post.post_attachments[0].url,
+					box: true,
+					height: 'auto',
+					url: url,
+					width: 200,
+					bottom: 20
+				});
+				imgPic.addEventListener('click', function(e){
+					var picModal2 = Ti.UI.createWindow({
+        			backgroundColor : 'black',
+        			barColor: '#46a546',
+        			title: 'Picture',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+				});
+				var imgPic2 = Titanium.UI.createImageView({
+					image: e.source.url,
+				});
+					win.navGroup.open(picModal2,{animated:false});
+					picModal2.add(imgPic2);
+				});
+				commentHolder[g].add(imgPic);
+			} else {
 					var attach = Titanium.UI.createLabel({
             		text: (post.post_attachments.length + ' file(s) attached'),
 					height: 'auto',
@@ -1741,13 +1920,14 @@ if (Titanium.Platform.osname == "iphone"){
 				});
 				backHolder[g].add(paperclip);
             	backHolder[g].add(attach);
+            }
 			}
 			seperatorPhone[g] = Ti.UI.createView({
 				backgroundColor: "#808080",
 				width:comWidth - 30,
 				height:1,
 			});
-			}
+		}
             
 			fbRow.add(commentHolder[g]);
             fbRow.add(seperatorPhone[g]);

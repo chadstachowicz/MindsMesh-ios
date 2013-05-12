@@ -18,7 +18,7 @@ function errorHTTPClient(request, mode, url, data, errObj, errMsg)
 };
 function createHttpClient(mode,url,data,header)
 {
-	var xhr = Titanium.Network.createHTTPClient({timeout:6000});
+	var xhr = Titanium.Network.createHTTPClient({timeout:3000});
 	xhr.retries = 0;
 	xhr.open(mode,url);
 	if(header == 'FILE'){
@@ -144,6 +144,17 @@ function getTopicPostsWithFamily(accessToken,topicId,before)
 		url = 'https://www.mindsmesh.com/api/v1/topics/' + topicId + '/posts/with_family?access_token=' + accessToken + '&before=' + before;
 	} else {
 		url = 'https://www.mindsmesh.com/api/v1/topics/' + topicId + '/posts/with_family?access_token=' + accessToken;
+	}
+	xhr = createHttpClient('GET',url);
+	return xhr;
+}
+function getGroupPostsWithFamily(accessToken,groupId,before)
+{
+	if(before)
+	{
+		url = 'https://www.mindsmesh.com/api/v1/groups/' + groupId + '/posts/with_family?access_token=' + accessToken + '&before=' + before;
+	} else {
+		url = 'https://www.mindsmesh.com/api/v1/groups/' + groupId + '/posts/with_family?access_token=' + accessToken;
 	}
 	xhr = createHttpClient('GET',url);
 	return xhr;

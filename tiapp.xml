@@ -3,17 +3,18 @@
     <property name="ti.android.runtime">v8</property>
     <property name="production" type="string">true</property>
     <deployment-targets>
+        <target device="tizen">false</target>
         <target device="mobileweb">false</target>
         <target device="iphone">true</target>
         <target device="ipad">true</target>
         <target device="android">true</target>
         <target device="blackberry">false</target>
     </deployment-targets>
-    <sdk-version>3.0.2.v20130207164659</sdk-version>
+    <sdk-version>3.0.2.GA</sdk-version>
     <id>com.mindsmesh.mobile</id>
     <name>MindsMesh</name>
-    <version>1.0.1</version>
-    <publisher>chadstachowicz</publisher>
+    <version>1.1.0</version>
+    <publisher>Minds Mesh, Inc.</publisher>
     <url>https://www.mindsmesh.com</url>
     <description>Minds Mesh is an education social network which allows students to collaborate with their classmates through Facebook, mobile and tablet apps.</description>
     <copyright>2012 by chadstachowicz</copyright>

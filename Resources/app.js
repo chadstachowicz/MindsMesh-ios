@@ -28,6 +28,7 @@ var menuTableView = Ti.UI.createTableView({
 
 var menuMoodle = [];
 var menuName = [];
+var groupName = [];
 
 function reopenLogin()	{
 	win.open();
@@ -117,12 +118,12 @@ fbRow8.add(labelIcon);
 fbRow8.add(labelTitle);
 var fbRow11 = Titanium.UI.createTableViewRow({
                 backgroundColor:'#252525',
-                id: 8,
+                id: 11,
 				height:40
             });
 var labelTitle = Titanium.UI.createLabel({
     			text:'Add Group....',
-    			id: 8,
+    			id: 11,
     			font:{fontSize:16},
     			color:'#e2e7ed',
    				width:'auto',
@@ -131,7 +132,7 @@ var labelTitle = Titanium.UI.createLabel({
 			});
 			var labelIcon = Titanium.UI.createImageView({
 				image: 'images/emblem_library.png',
-				id: 8,
+				id: 11,
 				left: 4,
 				top: 4,
 				height:32,
@@ -252,6 +253,7 @@ menuTitles = [fbRow1, fbRow9] } else{
             if (c==0){fbRow.header = 'Groups'}
 			var labelTitle = Titanium.UI.createLabel({
     			text:user.group_users[c].group.name,
+    			name:user.group_users[c].group.name,
     			font:{fontSize:16},
     			id: 2,
     			color:'#e2e7ed',
@@ -263,17 +265,17 @@ menuTitles = [fbRow1, fbRow9] } else{
 			});
 			var labelIcon = Titanium.UI.createImageView({
 				image: 'images/emblem_library.png',
-				id: 7,
+				id: 2,
 				left: 4,
 				top: 4,
 				height:32,
 				width:32,
 				moodle: false,
+				name: user.group_users[c].group.name,
                 extraData: user.group_users[c].group.id
 			});
 			fbRow.add(labelIcon);
-			fbRow.add(labelTitle);
-			menuName[user.group_users[c].group.id] = user.group_users[c].group.name;
+			groupName[user.group_users[c].group.id] = user.group_users[c].group.name;
 			fbRow.add(labelTitle);
             menuTitles.push(fbRow);
         }
@@ -422,7 +424,7 @@ menuTableView.addEventListener('click', function(e)
    } else if (e.source.id == 7){
      Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, topic_id: e.source.extraData});
    } else if (e.source.id == 2){
-     Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, topic_id: e.source.extraData});
+     Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:2, group_id: e.source.extraData});
    } else if (e.source.id == 8){
      Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:8});
    } else if (e.source.id == 9){
@@ -481,6 +483,8 @@ Titanium.App.addEventListener('nav-menu-button', function(e)
         // If the menu is opened
     var menu_id = e.menu_id;
     var topic_id = e.topic_id;
+    var group_id = e.group_id;
+    var group_name = groupName[group_id];
     var moodle = menuMoodle[topic_id];
     var class_number = menuName[topic_id];
     if(e.data == true){
