@@ -442,6 +442,8 @@ xhr.onload = function(){
 		if (post.post_attachments.length > 0)
 		{
 			var myRegEx = /\.png$/i;
+				var myRegEx2 = /\.jpg$/i;
+				var myRegEx3 = /\.jpeg$/i;
 			if(post.post_attachments[0].name == "post.mov")
 			{
 		    	var movieModal = Ti.UI.createWindow({
@@ -464,13 +466,12 @@ xhr.onload = function(){
   	 			var movPict = Titanium.UI.createImageView({
 					image: (pieces + "frame_0000.png"),
 					box: true,
-					height: 'auto',
-					width: 200,
-					bottom: 20
+					height: 260,
+					bottom: 15
 				});
 				var playButton = Titanium.UI.createImageView({
 					image: '../images/LH2-Play-icon-2.png',
-					top: -150,
+					top: -170,
 					height: 32,
 					zIndex: 1,
 					box: true,
@@ -497,7 +498,7 @@ xhr.onload = function(){
 				});
 				commentHolder.add(movPict);
 				commentHolder.add(playButton);
-			} else if (post.post_attachments[0].name.match(myRegEx)) {
+			} else if (post.post_attachments[0].name.match(myRegEx) || post.post_attachments[0].name.match(myRegEx2) || post.post_attachments[0].name.match(myRegEx3)) {
 				var picModal = Ti.UI.createWindow({
         			backgroundColor : 'black',
         			barColor: '#46a546',
@@ -773,120 +774,198 @@ xhr.onload = function(){
 			});
 			commentHolder.add(commentSpacer);
             if (post.post_attachments.length > 0)
+		{
+			var myRegEx = /\.png$/i;
+				var myRegEx2 = /\.jpg$/i;
+				var myRegEx3 = /\.jpeg$/i;
+			if(post.post_attachments[0].name == "post.mov")
 			{
-					var view = Titanium.UI.createLabel({
-						height: 50,
-						width: 'auto',
-						left:15,
+		    	var movieModal = Ti.UI.createWindow({
+        		 	backgroundColor : '#00000000',
+        			barColor: '#46a546',
+        			title: 'Video',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+
+				});
+				var activeMovie = Ti.Media.createVideoPlayer({
+    				backgroundColor: '#000',
+    				fullscreen: true,
+    				scalingMode: Titanium.Media.VIDEO_SCALING_ASPECT_FIT,
+    				mediaControlMode: Titanium.Media.VIDEO_CONTROL_NONE,
+    				url: post.post_attachments[0].url,
+    				autoplay: false
+				});
+				var url = post.post_attachments[0].url;
+				var pieces = url.substring(0, url.length - 8);
+  	 			var movPict = Titanium.UI.createImageView({
+					image: (pieces + "frame_0000.png"),
+					box: true,
+					height: 260,
+					bottom: 15
+				});
+				var playButton = Titanium.UI.createImageView({
+					image: '../images/LH2-Play-icon-2.png',
+					top: -170,
+					height: 32,
+					zIndex: 1,
+					box: true,
+					width: 32,
+				});
+				
+				movPict.addEventListener('click', function(e){
+					win.navGroup.open(movieModal,{animated:false});
+					movieModal.add(activeMovie);
+					activeMovie.addEventListener('fullscreen', function(e){
+    					if (e.entering == 0) {
+       				 		win.navGroup.close(movieModal);
+    					}
 					});
-					var attach = Titanium.UI.createLabel({
+				});
+				playButton.addEventListener('click', function(e){
+					win.navGroup.open(movieModal,{animated:false});
+					movieModal.add(activeMovie);
+					activeMovie.addEventListener('fullscreen', function(e){
+    					if (e.entering == 0) {
+    						win.navGroup.close(movieModal);
+    					}
+					}); 
+				});
+				commentHolder.add(movPict);
+				commentHolder.add(playButton);
+			} else if (post.post_attachments[0].name.match(myRegEx) || post.post_attachments[0].name.match(myRegEx2) || post.post_attachments[0].name.match(myRegEx3)) {
+				var picModal = Ti.UI.createWindow({
+        			backgroundColor : 'black',
+        			barColor: '#46a546',
+        			title: 'Picture',
+        			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
+				});
+				var imgPic = Titanium.UI.createImageView({
+					image: post.post_attachments[0].url,
+					box: true,
+					height: 'auto',
+					width: 200,
+					bottom: 20
+				});
+				imgPic.addEventListener('click', function(e){
+					win.navGroup.open(picModal,{animated:false});
+					picModal.add(imgPic);
+				});
+				commentHolder.add(imgPic);
+				
+			} else {
+				var view = Titanium.UI.createLabel({
+					height: 25,
+					width: 'auto',
+					left:10,
+				});
+				var attach = Titanium.UI.createLabel({
             		text: (post.post_attachments.length + ' file(s) attached'),
 					height: 'auto',
 					textAlign: 'center',
-					left: 50,
-					top: 20,
-					font:{fontSize:14, color: '#fff'}
-					});
-					var paperclip = Titanium.UI.createImageView({
-					image: '../images/paperclip4_black.png',
-					left: 15,
-					top:9,
-					height:32,
-					width:32,
+					left: 18,
+					top: 6,
+					font:{fontSize:11, color: '#fff'}
+				});
+				var paperclip = Titanium.UI.createImageView({
+					image: '../images/paperclip_black_24.png',
+					top:4,
+					left:0,
+					height:16,
+					width:16,
 				});
 				view.add(paperclip);
             	view.add(attach);
             	commentHolder.add(view);
             	view.addEventListener('click', function(e){
-    var winModalFiles = Ti.UI.createWindow({
-        backgroundColor : '#B0000000'
-    });
-        	var win_height = 380;
-   		var win_width = Ti.Platform.displayCaps.platformWidth * .85;
+    				var winModalFiles = Ti.UI.createWindow({
+       					backgroundColor : '#B0000000'
+    				});
+        			var win_height = 380;
+   					var win_width = Ti.Platform.displayCaps.platformWidth * .85;
  
-    	var viewFiles = Ti.UI.createView({
-        	backgroundColor : '#e2e7ed',
-        	borderColor : '#A5A5A5',
-        	box: true,
-        	borderRadius : 15,
-        	top: 50,
-        	layout: 'vertical',
-        	borderWidth : 2,
-        	width : win_width,
-        	height : win_height
-   		 });
-   		 var modalTableViewFiles = Titanium.UI.createTableView({
-			backgroundColor:'#e2e7ed',
-			box: true
-		});
-		modalTableViewFiles.addEventListener('click', function(e){			
-			var win1 = Titanium.UI.createWindow({  
-    					title:e.source.title,
-   	 					backgroundColor:'#ecfaff',
-   	 					layout:'absolute',
-   	 					barColor: '#46a546'
+    				var viewFiles = Ti.UI.createView({
+        				backgroundColor : '#e2e7ed',
+        				borderColor : '#A5A5A5',
+        				box: true,
+        				borderRadius : 15,
+        				top: 50,
+        				layout: 'vertical',
+        				borderWidth : 2,
+        				width : win_width,
+        				height : win_height
+   		 			});
+   		 			var modalTableViewFiles = Titanium.UI.createTableView({
+						backgroundColor:'#e2e7ed',
+						box: true
+					});
+					modalTableViewFiles.addEventListener('click', function(e){			
+						var win1 = Titanium.UI.createWindow({  
+    						title:e.source.title,
+   	 						backgroundColor:'#ecfaff',
+   	 						layout:'absolute',
+   	 						barColor: '#46a546'
 						});
-					win1.docurl = e.source.url;
-					var webview = Titanium.UI.createWebView({url:e.source.url});
-					win1.add(webview);
-					winModalFiles.close();
-					win.navGroup.open(win1,{animated:false});
+						win1.docurl = e.source.url;
+						var webview = Titanium.UI.createWebView({url:e.source.url});
+						win1.add(webview);
+						winModalFiles.close();
+						win.navGroup.open(win1,{animated:false});
 		
-			});
+					});
 
-		   		 var labelTitleFiles = Titanium.UI.createLabel({
-    			text:'Files',
-    			font:{fontSize:16,fontWeight:'bold'},
-    			color:'#000',
-    			box: true,
-   				width:Ti.UI.Size,
-    			textAlign:'center',
-    			top: 5,
- 
-			});
-		var seperatorPhoneFiles = Ti.UI.createView({
-				backgroundColor: "#808080",
-				width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 10,
-				top: 5,
-				box: true,
-				height:2,
-			});
-		 viewFiles.add(labelTitleFiles);
-		 viewFiles.add(seperatorPhoneFiles);
-		 viewFiles.add(modalTableViewFiles);
-   		 winModalFiles.add(viewFiles);
-   		 for (c=0;c<post.post_attachments.length;c++)
-		{
-   		 var classNumber = Titanium.UI.createLabel({
-    			text:post.post_attachments[c].name,
-    			url: post.post_attachments[c].url,
-    			font:{fontSize:14,fontWeight:'bold'},
-    			color:'#000',
-   				width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 10,
-   				height: '36',
-   				top: 2,
-   				box:true,
-    			textAlign:'left',
-    			left: 10
- 
-			});
-		var fbRow = Titanium.UI.createTableViewRow({
-                backgroundColor:'#e2e7ed',
-                text:post.post_attachments[c].name,
-    			url: post.post_attachments[c].url,
-                layout: 'vertical',
-                box:true,
-                height: 40
-          });
-            fbRow.add(classNumber);
-         modalTableViewFiles.appendRow(fbRow);
-        }
-        winModalFiles.open();
-            		winModalFiles.addEventListener('click', function(e){
-			 		if(e.source.box != true){
- 						winModalFiles.close();}
- 					})
-            	});
+		   		 	var labelTitleFiles = Titanium.UI.createLabel({
+    					text:'Files',
+    					font:{fontSize:16,fontWeight:'bold'},
+    					color:'#000',
+    					box: true,
+   						width:Ti.UI.Size,
+    					textAlign:'center',
+    					top: 5,
+ 					});
+					var seperatorPhoneFiles = Ti.UI.createView({
+						backgroundColor: "#808080",
+						width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 10,
+						top: 5,
+						box: true,
+						height:2,
+					});
+		 			viewFiles.add(labelTitleFiles);
+		 			viewFiles.add(seperatorPhoneFiles);
+		 			viewFiles.add(modalTableViewFiles);
+   		 			winModalFiles.add(viewFiles);
+   		 			for (c=0;c<post.post_attachments.length;c++)
+					{
+   		 				var classNumber = Titanium.UI.createLabel({
+    						text:post.post_attachments[c].name,
+    						url: post.post_attachments[c].url,
+    						font:{fontSize:14,fontWeight:'bold'},
+    						color:'#000',
+   							width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 10,
+   							height: '36',
+   							top: 2,
+   							box:true,
+    						textAlign:'left',
+    						left: 10
+ 						});
+						var fbRow = Titanium.UI.createTableViewRow({
+                			backgroundColor:'#e2e7ed',
+                			text:post.post_attachments[c].name,
+    						url: post.post_attachments[c].url,
+                			layout: 'vertical',
+               				box:true,
+                			height: 40
+         				 });
+            			fbRow.add(classNumber);
+         					modalTableViewFiles.appendRow(fbRow);
+        				}
+        				winModalFiles.open();
+            			winModalFiles.addEventListener('click', function(e){
+			 				if(e.source.box != true){
+ 								winModalFiles.close();
+ 							}
+ 						});
+            		});
+         		}
 			}
 			fbRow.add(commentHolder);
 			var seperatorPhone = Ti.UI.createView({

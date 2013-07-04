@@ -63,7 +63,7 @@ var confirm = Titanium.UI.createButton({
        								axis:0 // Custom property for X axis
     			 				});
 							}
-							win.navGroup.open(win1,{animated:false});
+							Titanium.App.fireEvent('loadFeed');
 						} else {
 							alert('You have not confirmed the email we have sent you.  If you would like to resend it to yourself please click the Re-enter Email button.')
 						}

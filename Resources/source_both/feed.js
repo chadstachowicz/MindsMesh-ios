@@ -1,5 +1,6 @@
 Ti.include("model/api.js");
 var AWS = require('modules/amazon').load();
+var row_data = [];
 var offset = 0;
 var data = [];
 var f;
@@ -23,7 +24,7 @@ btnBar.addEventListener('click', function(e) {
     	shareModal.open();
 		shareModal.visible = true;
   } else if (e.index == 1) {
-  	if (Titanium.App.Properties.hasProperty('moodle-user') == false || Titanium.App.Properties.hasProperty('moodle-user') == 0 || Titanium.App.Properties.hasProperty('moodle-pass') == false || Titanium.App.Properties.hasProperty('moodle-pass') == 0)
+  	if (Titanium.App.Properties.hasProperty('moodle-user-' + win.entity_id) == false || Titanium.App.Properties.hasProperty('moodle-user-' + win.entity_id) == null || Titanium.App.Properties.hasProperty('moodle-pass-' + win.entity_id) == false || Titanium.App.Properties.hasProperty('moodle-pass-' + win.entity_id) == null)
   	{
   		
   		var win1 = Titanium.UI.createWindow({  
@@ -42,28 +43,60 @@ btnBar.addEventListener('click', function(e) {
 	loadView.add(loadIndicator);
 	loadView.open();
 	loadIndicator.show();
-  	var postData = {username: Titanium.App.Properties.getString('moodle-user'), password: Titanium.App.Properties.getString('moodle-pass')};	
-  	xhr = postLoginToMoodle(win.moodle,postData);
-	xhr.onload = function(){
+	if (win.entity_id == 2)
+	{
+		var postData = {username: Titanium.App.Properties.getString('moodle-user-' + win.entity_id), password: Titanium.App.Properties.getString('moodle-pass-' + win.entity_id)};	
+  		xhr = postLoginToMoodle(win.moodle,postData);
+		xhr.onload = function(){
 		var response = this.responseText;
-var regexSess = /Your\ssession\shas/i;
-var regexSess2 = /your\slogin\ssession/i;
-			var regexLog = /Invalid\slogin/i;
-			if(response.match(regexSess2)) {
-				xhr = postLoginToMoodle(win.moodle,postData);
-				xhr.onload = function(){
-					var response2 = this.responseText;
-					redirectToMoodle(response2);
-				};
-				xhr.send(postData);
-			} else if(response.match(regexLog)) {
-				alert('These are not valid credentials.  Please correct them.');
-			} else {
-				redirectToMoodle(response);
-
-	}
+		var regexSess = /Your\ssession\shas/i;
+		var regexSess2 = /your\slogin\ssession/i;
+		var regexLog = /Invalid\slogin/i;
+		if(response.match(regexSess2)) 
+		{
+			xhr = postLoginToMoodle(win.moodle,postData);
+			xhr.onload = function()
+			{
+				var response2 = this.responseText;
+				redirectToMoodle(response2);
+			};
+			xhr.send(postData);
+		} else if(response.match(regexLog)) {
+			alert('These are not valid credentials.  Please correct them.');
+		} else {
+			redirectToMoodle(response);
+		}
 	}
 	xhr.send(postData);
+	} else {
+		xhr = getMoodle2EnrolledCourses(Titanium.App.Properties.getString("moodle_url_" + win.entity_id),Titanium.App.Properties.getString("moodle-token-" + win.entity_id),Titanium.App.Properties.getString("moodle-userid-" + win.entity_id));
+		xhr.onload = function()
+		{
+			var response = this.responseText;
+			var courses = JSON.parse(response);
+			for(c=0;c<courses.length;c++)
+			{
+				if (courses[c].shortname == win.class_number)
+				{
+					var win1 = Titanium.UI.createWindow({  
+    					url:'moodle_class.js',
+    					navGroup: win.navGroup,
+    					backgroundColor:'#ecfaff',
+    					barColor: '#46a546'
+					});
+					win1.class_id = courses[c].id;
+					win1.entity_id = win.entity_id;
+					win.navGroup.open(win1,{animated:false});
+				}
+			}
+			loadView.close();
+			//alert("No Moodle Course found for this discussion.  Make sure course Numbers between MindsMesh.com and Moodle match exactly, and that you are a part of the class on your schools Moodle.");
+		}
+		xhr.send();
+		
+		
+		
+	}
 	}
   } 
 });
@@ -914,7 +947,7 @@ var winModal = Ti.UI.createWindow({
    		 winModal.add(view);
 var tableView = Titanium.UI.createTableView({
 	backgroundColor:'#46a546',
-	separatorStyle: 'none'
+	separatorColor: 'transparent',
 });
 var scrollView = Ti.UI.createScrollView({
             contentHeight : 'auto',
@@ -1266,7 +1299,7 @@ function beginReloading()
 
 function endReloading()
 {
-	var rd = []; tableView.data = rd;
+	row_data = []; tableView.data = row_data;
 	lastRow = 0;
 	lastRowId = 1;
 	if(win.topic_id != null){
@@ -1300,6 +1333,7 @@ win.addEventListener('focus', function()
   if ( Titanium.Network.online) {
   	if (win.passedData == 'posted'){
   		reloading = true;
+  		row_data = [];
   		tableView.setData([]);
     	beginReloading();
    } else {
@@ -1557,8 +1591,8 @@ if (Titanium.Platform.osname == "iphone"){
 			})
 			tmpView.add(givbutton);
             tmpView.add(commentCount);
-			
-			
+
+
 			var pict = Titanium.UI.createImageView({
 				image: picUrl,
 				top: 10,
@@ -1616,9 +1650,9 @@ if (Titanium.Platform.osname == "iphone"){
 		height:Ti.UI.SIZE,
 		layout:'vertical'
 	});
-	
-	
-	
+
+
+
 	var commentCount = Titanium.UI.createLabel({
            text: post.replies_count,
            bottom: 13,
@@ -1644,8 +1678,8 @@ if (Titanium.Platform.osname == "iphone"){
 			})
 			tmpView.add(givbutton);
             tmpView.add(commentCount);
-			
-			
+
+
 			var pict = Titanium.UI.createImageView({
 				image: picUrl,
 				top: 15,
@@ -1671,13 +1705,14 @@ if (Titanium.Platform.osname == "iphone"){
 				backgroundColor:"#e2e7ed",
 				width:Titanium.Platform.displayCaps.platformWidth - 10,
 				height:'auto',
-				zIndex: -1,
 				height: 30,
 				bottom: 6,
 			});
 			if (post.post_attachments.length > 0)
 			{
 				var myRegEx = /\.png$/i;
+				var myRegEx2 = /\.jpg$/i;
+				var myRegEx3 = /\.jpeg$/i;
 			if(post.post_attachments[0].name == "post.mov")
 			{
 				var url = post.post_attachments[0].url;
@@ -1685,8 +1720,7 @@ if (Titanium.Platform.osname == "iphone"){
   	 			var movPict = Titanium.UI.createImageView({
 					image: (pieces + "frame_0000.png"),
 					box: true,
-					height: 'auto',
-					width: 200,
+					height: 280,
 					url: url,
 					bottom: 5
 				});
@@ -1747,7 +1781,7 @@ if (Titanium.Platform.osname == "iphone"){
 				});
 				commentHolder[g].add(movPict);
 				commentHolder[g].add(playButton);
-			} else if (post.post_attachments[0].name.match(myRegEx)) {
+			} else if (post.post_attachments[0].name.match(myRegEx) || post.post_attachments[0].name.match(myRegEx2) || post.post_attachments[0].name.match(myRegEx3)) {
 				var url = post.post_attachments[0].url;
 				var imgPic = Titanium.UI.createImageView({
 					image: post.post_attachments[0].url,
@@ -1801,13 +1835,14 @@ if (Titanium.Platform.osname == "iphone"){
 				backgroundColor:"#e2e7ed",
 				width:comWidth - 30,
 				height:'auto',
-				zIndex: -1,
 				height: 42,
 				bottom: 6,
 			});
 			if (post.post_attachments.length > 0)
 			{
 				var myRegEx = /\.png$/i;
+				var myRegEx2 = /\.jpg$/i;
+				var myRegEx3 = /\.jpeg$/i;
 			if(post.post_attachments[0].name == "post.mov")
 			{
 				var url = post.post_attachments[0].url;
@@ -1815,21 +1850,20 @@ if (Titanium.Platform.osname == "iphone"){
   	 			var movPict = Titanium.UI.createImageView({
 					image: (pieces + "frame_0000.png"),
 					box: true,
-					height: 'auto',
+					height: 260,
 					url: post.post_attachments[0].url,
-					width: 200,
 					bottom: 5
 				});
 				var playButton = Titanium.UI.createImageView({
 					image: '../images/LH2-Play-icon-2.png',
-					top: -150,
+					top: -170,
 					height: 32,
 					url: post.post_attachments[0].url,
 					zIndex: 1,
 					box: true,
 					width: 32,
 				});
-				
+
 				movPict.addEventListener('click', function(e){
 				var movieModal2 = Ti.UI.createWindow({
         		 	backgroundColor : '#00000000',
@@ -1878,7 +1912,7 @@ if (Titanium.Platform.osname == "iphone"){
 				});
 				commentHolder[g].add(movPict);
 				commentHolder[g].add(playButton);
-			} else if (post.post_attachments[0].name.match(myRegEx)) {
+			} else if (post.post_attachments[0].name.match(myRegEx) || post.post_attachments[0].name.match(myRegEx2) || post.post_attachments[0].name.match(myRegEx3)) {
 				var url = post.post_attachments[0].url;
 				var imgPic = Titanium.UI.createImageView({
 					image: post.post_attachments[0].url,
@@ -1933,12 +1967,13 @@ if (Titanium.Platform.osname == "iphone"){
             fbRow.add(seperatorPhone[g]);
             backHolder[g].add(tmpView);
             fbRow.add(backHolder[g]);
-            tableView.appendRow(fbRow);
+            row_data[g] = fbRow;
             g++;
 
 
            
         }
+        tableView.setData(row_data);
         if (updating){
         	tableView.scrollToIndex(lastRow-(row.length - 1),{animated:true,position:Ti.UI.iPhone.TableViewScrollPosition.BOTTOM});
         }
@@ -1978,8 +2013,6 @@ if (Titanium.Platform.osname == "iphone"){
 			win1.Moodurl = totalURL[0];
 			win.navGroup.open(win1,{animated:false});
 	} else {
-		
+
 	}
-};
-   
-   				
+};			

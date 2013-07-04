@@ -6,6 +6,77 @@ var menuButton = Ti.UI.createButton({
     toggle:false // Custom property for menu toggle
 });
 win.setLeftNavButton(menuButton);
+var data = [];
+if(Titanium.Platform.osname == 'iphone'){
+var label1 = Titanium.UI.createLabel({
+	text: 'Moodle Username',
+	top: 5,
+	height:40,
+	width: 320,
+	
+});
+var ta1 = Titanium.UI.createTextField({
+	value: Titanium.App.Properties.getString('moodle-user-' + selectedId),
+	hintText:"Moodle Username",
+	top: 5,
+	height:40,
+	width: 320,
+	borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
+	
+});
+var label2 = Titanium.UI.createLabel({
+	text: 'Moodle Password',
+	top: 5,
+	height:40,
+	width: 320,
+	
+});
+var ta2 = Titanium.UI.createTextField({	
+	value: Titanium.App.Properties.getString('moodle-pass-' + selectedId),
+	hintText:"Moodle Password",
+	passwordMask: true,
+	top: 5,
+	height:40,
+	width: 320,
+	borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
+	
+});
+} else {
+	var label1 = Titanium.UI.createLabel({
+	text: 'Moodle Username',
+	top: 10,
+	height:40,
+	width: 320,
+	
+});
+	var ta1 = Titanium.UI.createTextField({
+	value: Titanium.App.Properties.getString('moodle-user-' + selectedId),
+	hintText:"Moodle Username",
+	top: 10,
+	height:40,
+	width: 750,
+	borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
+	
+});
+var label2 = Titanium.UI.createLabel({
+	text: 'Moodle Username',
+	top: 10,
+	height:40,
+	width: 320,
+	
+});
+var ta2 = Titanium.UI.createTextField({
+	value: Titanium.App.Properties.getString('moodle-pass-' + selectedId),
+	hintText:"Moodle Password",
+	passwordMask: true,
+	top: 10,
+	height:40,
+	width: 750,
+	borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
+	
+});
+}
+
 
 menuButton.addEventListener('click', function(e){
 	if(menuButton.toggle == false)
@@ -44,7 +115,7 @@ var importWiz = Titanium.UI.createButton({
 					backgroundImage: 'none',
 					borderRadius: 10,
 					font:{fontWeight:'bold',fontSize:12, color: '#fff'}
-					});
+});
 					importWiz.addEventListener('click', function(e)
 					{
 						if (Titanium.App.Properties.hasProperty('moodle-user') == false || Titanium.App.Properties.hasProperty('moodle-user') == 0 || Titanium.App.Properties.hasProperty('moodle-pass') == false || Titanium.App.Properties.hasProperty('moodle-pass') == 0)
@@ -61,7 +132,7 @@ var importWiz = Titanium.UI.createButton({
 					});
 					win.navGroup.open(win1,{animated:false});
 					}
-					});
+		});
 					importWiz.addEventListener('touchstart', function(){
 						this.setBackgroundColor('blue');
 					});
@@ -80,7 +151,7 @@ xhr.onload = function(){
 	var response = this.responseText;
 	var user = JSON.parse(response);
 	for(c=0;c<user.entity_users.length;c++){
-            data[c]=Ti.UI.createPickerRow({title:user.entity_users[c].entity.name,entity_user_id:user.entity_users[c].id});
+            data[c]=Ti.UI.createPickerRow({title:user.entity_users[c].entity.name,entity_id:user.entity_users[c].entity.id});
         }
         var picker = Ti.UI.createPicker({
 			bottom: 0,
@@ -119,6 +190,7 @@ var my_combo = Titanium.UI.createTextField({
 	rightButtonMode:Titanium.UI.INPUT_BUTTONMODE_ALWAYS
 });
 }
+win.add(my_combo);
 win.add(label1);
 win.add(ta1);
 win.add(label2);
@@ -129,11 +201,21 @@ win.add(importWiz);
 	win.add(picker);
 	picker.hide();
 	
-	picker.addEventListener('change', function(e){
+picker.addEventListener('change', function(e){
 	pickerSelected = e.row;
-	selectedId = picker.getSelectedRow(0).entity_user_id;
+	selectedId = picker.getSelectedRow(0).entity_id;
+	if (Titanium.App.Properties.getString('moodle-user-' + picker.getSelectedRow(0).entity_id) != null){
+		ta1.value = Titanium.App.Properties.getString('moodle-user-' + picker.getSelectedRow(0).entity_id);
+	} else {
+		ta1.value = "";
+	}
+	if (Titanium.App.Properties.getString('moodle-pass-' + picker.getSelectedRow(0).entity_id) != null){
+		ta2.value = Titanium.App.Properties.getString('moodle-pass-' + picker.getSelectedRow(0).entity_id);
+	} else {
+		ta2.value = "";
+	}
 	my_combo.value = picker.getSelectedRow(0).title;
-	});
+});
 	ta1.addEventListener("focus", function(e) {
 	picker.hide();
 });
@@ -170,76 +252,6 @@ drop_button.addEventListener("click", function(e) {
 
 }
 xhr.send();
-var data = [];
-if(Titanium.Platform.osname == 'iphone'){
-var label1 = Titanium.UI.createLabel({
-	text: 'Moodle Username',
-	top: 5,
-	height:40,
-	width: 320,
-	
-});
-var ta1 = Titanium.UI.createTextField({
-	value: Titanium.App.Properties.getString('moodle-user'),
-	hintText:"Moodle Username",
-	top: 5,
-	height:40,
-	width: 320,
-	borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
-	
-});
-var label2 = Titanium.UI.createLabel({
-	text: 'Moodle Password',
-	top: 5,
-	height:40,
-	width: 320,
-	
-});
-var ta2 = Titanium.UI.createTextField({	
-	value: Titanium.App.Properties.getString('moodle-pass'),
-	hintText:"Moodle Password",
-	passwordMask: true,
-	top: 5,
-	height:40,
-	width: 320,
-	borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
-	
-});
-} else {
-	var label1 = Titanium.UI.createLabel({
-	text: 'Moodle Username',
-	top: 10,
-	height:40,
-	width: 320,
-	
-});
-	var ta1 = Titanium.UI.createTextField({
-	value: Titanium.App.Properties.getString('moodle-user'),
-	hintText:"Moodle Username",
-	top: 10,
-	height:40,
-	width: 750,
-	borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
-	
-});
-var label2 = Titanium.UI.createLabel({
-	text: 'Moodle Username',
-	top: 10,
-	height:40,
-	width: 320,
-	
-});
-var ta2 = Titanium.UI.createTextField({
-	value: Titanium.App.Properties.getString('moodle-pass'),
-	hintText:"Moodle Password",
-	passwordMask: true,
-	top: 10,
-	height:40,
-	width: 750,
-	borderStyle:Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
-	
-});
-}
 
 
 btnCreate.addEventListener('click', function(e){
@@ -253,34 +265,64 @@ btnCreate.addEventListener('click', function(e){
 		{
 			alert("You must enter a Moodle password.");
 		} else {
-			var postData = {username: ta1.value, password: ta2.value};
-			//xhr = postLoginToMoodle("http://elondev.mrooms3.net/login/index.php",postData);
-			xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url_2"),postData);
-			xhr.onload = function(){
-			var response = this.responseText;
-			var regexSess = /Your\ssession\shas/;
-var regexSess2 = /your\slogin\ssession/;
-			var regexLog = /Invalid\slogin/;
-			if(response.match(regexSess2)) {
-				xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url_2"),postData);
-				xhr.onload = function(){
-					var response2 = this.responseText;
-					redirectToWizard();
-				};
-				xhr.send(postData);
-			} else if(response.match(regexLog)) {
-				alert('These are not valid credentials.  Please correct them.');
-			} else {
-				redirectToWizard();
-			}
-       		}
+			if (selectedId == 2)
+			{
+				var postData = {username: ta1.value, password: ta2.value};
+				xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url_" + selectedId),postData);
+				xhr.onload = function()
+				{
+					var response = this.responseText;
+					var regexSess = /Your\ssession\shas/;
+					var regexSess2 = /your\slogin\ssession/;
+					var regexLog = /Invalid\slogin/;
+					if(response.match(regexSess2)) 
+					{
+						xhr = postLoginToMoodle(Titanium.App.Properties.getString("moodle_url_" + selectedId),postData);
+						xhr.onload = function()
+						{
+							var response2 = this.responseText;
+							redirectToWizard();
+						};
+						xhr.send(postData);
+					} else if(response.match(regexLog)) {
+						alert('These are not valid credentials.  Please correct them.');
+					} else {
+						redirectToWizard();
+					}
+       			}
 			xhr.send(postData);
+			} else {
+				
+								xhr = getLoginToMoodle2(Titanium.App.Properties.getString("moodle_url_" + selectedId),ta1.value,ta2.value);
+				xhr.onload = function()
+				{
+					var response = this.responseText;
+					var user = JSON.parse(response);
+					if (user.token != null){
+						Titanium.App.Properties.setString('moodle-user-' + selectedId, ta1.value);
+						Titanium.App.Properties.setString('moodle-pass-' + selectedId, ta2.value);
+						Titanium.App.Properties.setString('moodle-token-' + selectedId, user.token);
+						xhr = getMoodle2SiteRetrieve(Titanium.App.Properties.getString("moodle_url_" + selectedId),user.token);
+						xhr.onload = function()
+						{
+							var response = this.responseText;
+							var user = JSON.parse(response);
+							Titanium.App.Properties.setString('moodle-userid-' + selectedId, user.userid);
+							alert("Your moodle credentials were good, enjoy!");
+						}
+						xhr.send();
+					} else {
+						alert("Your moodle credentials were no good, please re-enter them!");
+					}
+				}
+				xhr.send();
+			}
 		}
 		
 });
 function redirectToWizard(){
-				Titanium.App.Properties.setString('moodle-user', ta1.value);
-				Titanium.App.Properties.setString('moodle-pass', ta2.value);
+				Titanium.App.Properties.setString('moodle-user-' + selectedId, ta1.value);
+				Titanium.App.Properties.setString('moodle-pass-' + selectedId, ta2.value);
 				if(Titanium.App.Properties.getString('moodle-wizard-run') == false)
 				{
 				var win1 = Titanium.UI.createWindow({  

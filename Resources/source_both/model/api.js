@@ -12,8 +12,7 @@ function errorHTTPClient(request, mode, url, data, errObj, errMsg)
     }
     else
     {   var desc = errObj.error.substring(errObj.error.indexOf("Description=")+12,errObj.error.lastIndexOf("}"));
-        errorAlert(L("Comms Error Title"),errMsg+desc);
-        request.abort();
+    
     }
 };
 function createHttpClient(mode,url,data,header)
@@ -32,6 +31,25 @@ function createHttpClient(mode,url,data,header)
 	xhr.onerror = function requestFailed(e) 
 	{
 		errorHTTPClient(xhr, mode, url, data, e, L("Comms Error Message"));
+	};
+	return xhr;
+}
+function createHttpClientNoError(mode,url,data,header)
+{
+	var xhr = Titanium.Network.createHTTPClient({timeout:3000});
+	xhr.retries = 0;
+	xhr.open(mode,url);
+	if(header == 'FILE'){
+		xhr.setRequestHeader("Content-Type", "multipart/form-data");
+	} else if (header != 'NONE'){
+		xhr.setRequestHeader("Content-Type", "application/json");
+	if(Titanium.Platform.osname == 'android'){
+	var androidUserAgent = 'Mozilla/5.0 (Linux; U; ' + Ti.Platform.name + ' ' + Ti.Platform.version + '; ' + Ti.Locale.currentLocale + '; ' + Ti.Platform.model + ' AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1';
+	xhr.setRequestHeader('User-Agent', androidUserAgent);}
+	}
+	xhr.onerror = function requestFailed(e) 
+	{
+		
 	};
 	return xhr;
 }
@@ -90,10 +108,22 @@ function postTopicSearch(accessToken,data)
 	xhr = createHttpClient('POST',url,data);
 	return xhr;
 }
-function postLogin(FBaccessToken)
+function postLogin(FBaccessToken,data)
 {
+	if (FBaccessToken == "")
+	{
+		url = 'https://www.mindsmesh.com/api/v1/session/login'; 
+	} else {
+	
 	url = 'https://www.mindsmesh.com/api/v1/session/login?fb_access_token=' + FBaccessToken; 
-	xhr = createHttpClient('POST',url);
+	}
+	xhr = createHttpClient('POST',url,data);
+	return xhr;
+}
+function postCreateUser(data)
+{
+	url = 'https://www.mindsmesh.com/api/v1/users/create'; 
+	xhr = createHttpClientNoError('POST',url,data);
 	return xhr;
 }
 function postTopicLeave(accessToken,topicId)
@@ -164,6 +194,30 @@ function postLoginToMoodle(url,data)
 	xhr = createHttpClient('POST',url,data,'NONE');
 	return xhr;
 }
+function getLoginToMoodle2(baseurl,username,password)
+{
+	url = baseurl + '/login/token.php?username=' + username + '&password=' + password + '&service=moodle_mobile_app';
+	xhr = createHttpClient('GET',url);
+	return xhr;
+}
+function getMoodle2SiteRetrieve(baseurl,wstoken)
+{
+	url = baseurl + '/webservice/rest/server.php?wstoken=' + wstoken + '&wsfunction=moodle_webservice_get_siteinfo&moodlewsrestformat=json';
+	xhr = createHttpClient('GET',url);
+	return xhr;
+}
+function getMoodle2CourseContents(baseurl,wstoken,courseid)
+{
+	url = baseurl + '/webservice/rest/server.php?wstoken=' + wstoken + '&wsfunction=core_course_get_contents&courseid=' + courseid + '&moodlewsrestformat=json';
+	xhr = createHttpClient('GET',url);
+	return xhr;
+}
+function getMoodle2EnrolledCourses(baseurl,wstoken,userid)
+{
+	url = baseurl + '/webservice/rest/server.php?wstoken=' + wstoken + '&wsfunction=moodle_enrol_get_users_courses&userid=' + userid + '&moodlewsrestformat=json';
+	xhr = createHttpClient('GET',url);
+	return xhr;
+}
 function postMethodToMoodleRooms(url,data)
 {
 	xhr = createHttpClient('POST',url,"",'NONE');
@@ -175,8 +229,4 @@ function getDataFromMoodle(url)
 	xhr = createHttpClient('GET',url,"",'NONE');
 	return xhr;
 }
-function postLoginToMoodle(url,data)
-{
-	xhr = createHttpClient('POST',url,data,'NONE');
-	return xhr;
-}
+
