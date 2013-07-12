@@ -4,7 +4,7 @@ win.layout = 'vertical';
 
 Titanium.App.addEventListener('main-win-close', function(e)
 {
-	win.navGroup.close(win);
+	win.close();
 });
 var label1 = Titanium.UI.createLabel({
 	text: 'Once you have verified the link which arrives in your email.  Please click the Confirmed button below.',
@@ -35,35 +35,19 @@ var confirm = Titanium.UI.createButton({
 						for (i=0;i<user.entity_users.length;i++){
 							if (user.entity_users[i].entity.moodle_url != null)
 							{
-								Titanium.App.Properties.setString("moodle_entity_id",user.entity_users[i].entity.id);
-								Titanium.App.Properties.setString("moodle_url",user.entity_users[i].entity.moodle_url);
-								Titanium.App.Properties.setString("entity_user_id",user.entity_users[i].id);
+								moodle_entity_string = "moodle_entity_" + user.entity_users[i].entity.id;
+								moodle_url_string = "moodle_url_" + user.entity_users[i].entity.id;
+								entity_user_string = "entity_user_" + user.entity_users[i].id;
+								Titanium.App.Properties.setString(moodle_entity_string,user.entity_users[i].entity.id);
+								Titanium.App.Properties.setString(moodle_url_string,user.entity_users[i].entity.moodle_url);
+								Titanium.App.Properties.setString(entity_user_string,user.entity_users[i].id);
 							}	
 						}
-						Titanium.App.fireEvent('reloadMenu');
 						if(user.entity_users.length > 0)
 						{
-							if(Titanium.App.Properties.getString("moodle_entity_id") != false && Titanium.App.Properties.hasProperty('moodle-user') == false){
-								var win1 = Titanium.UI.createWindow({  
-    								title:'Moodle Account',
-   									url:'moodle_account.js',
-    								barColor: '#46a546',
-    								navGroup: win.navGroup,
-   	    							backgroundColor:"#e2e7ed",
-       								moving:false, // Custom property for movement
-       								axis:0 // Custom property for X axis
-    			 				});
-							} else {
-								var win1 = Titanium.UI.createWindow({  
-   									url:'feed.js',
-    								barColor: '#46a546',
-    								navGroup: win.navGroup,
-   	    							backgroundColor:"#46a546",
-       								moving:false, // Custom property for movement
-       								axis:0 // Custom property for X axis
-    			 				});
-							}
-							Titanium.App.fireEvent('loadFeed');
+							Titanium.App.Properties.setString("num_entities",user.entity_users.length);
+							Titanium.App.fireEvent('redirectAfterLogin');
+							
 						} else {
 							alert('You have not confirmed the email we have sent you.  If you would like to resend it to yourself please click the Re-enter Email button.')
 						}
@@ -90,7 +74,17 @@ var confirm = Titanium.UI.createButton({
 					});
 					remail.addEventListener('click', function(e)
 					{
-						win.navGroup.close(win);	
+						var win4 = Titanium.UI.createWindow({  
+    						title:'Verify Email',
+   							url:'join_school.js',
+    						barColor: '#46a546',
+    						navGroup: win.navGroup,
+   	    					backgroundColor:'#ecfaff',
+       						moving:false, // Custom property for movement
+       						axis:0 // Custom property for X axis
+    					 });
+    					 win.navGroup.open(win4,{animated:false});
+    					 
 					});
 					remail.addEventListener('touchstart', function(){
 						this.setBackgroundColor('blue');

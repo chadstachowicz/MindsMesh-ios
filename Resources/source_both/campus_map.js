@@ -1,16 +1,16 @@
 Ti.include("model/api.js");
 var win = Titanium.UI.currentWindow;
-win.layout = 'vertical';
 var htmlFile = '../html/map.html';
 var wv = Ti.UI.createWebView({
     url: htmlFile,
+    top:'88dp',
 });
  var search = Titanium.UI.createSearchBar({
 	barColor:"#808080",
 	//showCancel:true,
 	hintText: 'Search Locations',
-	height:43,
-	top:0
+	height:'44dp',
+	top:'44dp'
 });
 var winModal = Ti.UI.createWindow({
         backgroundColor : '#B0000000',

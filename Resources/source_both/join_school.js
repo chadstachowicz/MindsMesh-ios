@@ -35,13 +35,7 @@ btnPost.addEventListener('click', function(e){
 			xhr = postEntityJoin(Titanium.App.Properties.getString('mmat'),postData)
 			xhr.onload = function(){
 				var response = this.responseText;
-				var win1 = Titanium.UI.createWindow({  
-   							url:'finish_verification.js',
-    						barColor: '#46a546',
-    						navGroup: win.navGroup,
-   	    					backgroundColor:"#e2e7ed"
-    			 		});
-				win.navGroup.open(win1,{animated:false});
+				win.navGroup.close(win);
 
 			};
 			xhr.send(JSON.stringify(postData));	
@@ -101,17 +95,11 @@ ta1.addEventListener('return', function(e)
 		if(reg.test(ta1.value) == false) {
 		   alert("This is not a valid educational email.");
 		} else {
-			xhr = postJoinEntity(Titanium.App.Properties.getString('mmat'),postData)
+			var postData = {'email':ta1.value};
+			xhr = postEntityJoin(Titanium.App.Properties.getString('mmat'),postData)
 			xhr.onload = function(){
 				var response = this.responseText;
-				var win1 = Titanium.UI.createWindow({  
-   							url:'finish_verification.js',
-    						barColor: '#46a546',
-    						navGroup: win.navGroup,
-   	    					backgroundColor:"#e2e7ed"
-    			 		});
-    			 		alert('test');
-				win.navGroup.open(win1,{animated:false});
+				win.navGroup.close(win);
 
 			};
 			xhr.send(JSON.stringify(postData));

@@ -22,6 +22,16 @@ var menuWindow = Ti.UI.createWindow({
 //// ---- Menu Table
 // Menu Titles
 	
+Titanium.App.addEventListener('reloadMenu', function(e)
+{   
+	reloadMenu();
+});
+Titanium.App.addEventListener('redirectAfterLogin', function(e)
+{   
+	redirectAfterLogin();
+});
+
+
 
 // Tableview
 var menuTableView = Ti.UI.createTableView({
@@ -404,9 +414,8 @@ var win1 = Titanium.UI.createWindow({
     moving:false, // Custom property for movement
     axis:0 // Custom property for X axis
 });
-	var win4 = Titanium.UI.createWindow({  
-    				title:'Confirm School Email',
-   					url:'source_both/join_school.js',
+	var win4 = Titanium.UI.createWindow({
+   					url:'source_both/finish_verification.js',
     				barColor: '#46a546',
    	    			backgroundColor:'#ecfaff',
        				moving:false, // Custom property for movement
@@ -447,6 +456,7 @@ var dlg = Titanium.UI.createAlertDialog({
    			dlg.addEventListener('click', function(ev) {
    				 if (ev.index == 0) {
    				 	Titanium.App.Properties.setString("logged_in", 'false');
+   				 	navWindow.close();
    				 	fb.logout();
 				reopenLogin();
 				navGroup.close();
@@ -461,10 +471,6 @@ var dlg = Titanium.UI.createAlertDialog({
 	navWindow = win1;
 }
 navWindow.open();
-Titanium.App.addEventListener('reloadMenu', function(e)
-{   
-	reloadMenu();
-});
 Titanium.App.addEventListener('loadFeed', function(e)
 {   
 	reloadMenu();
@@ -812,7 +818,12 @@ win.add(pict);
    		 shareWhoModal2.add(view);
 		 shareWhoModal2.addEventListener('click', function(e)
 		 {
-			if(e.source.box != true)
+		 	if(e.source != "[object TiUITextField]")
+			{
+   				email.blur();
+   				password.blur();
+ 			}
+			if(e.source.box != true && e.source != "[object TiUITextField]")
 			{
    				shareWhoModal2.close();
  			}
@@ -917,27 +928,26 @@ win.add(pict);
 					Titanium.App.Properties.setString("userid",user.id);
 					Titanium.App.Properties.setString("mmat", user.access_token);
 					Titanium.App.Properties.setString("photo_url", user.photo_url);
+					var navWindow = Ti.UI.createWindow({
+						//height:Titanium.Platform.displayCaps.platformHeight,
+   						width:Titanium.Platform.displayCaps.platformWidth, // Set the width of the sliding window to avoid cut out from animation
+						backgroundColor:"#e2e7ed"
+					});
 				    var win4 = Titanium.UI.createWindow({  
    						url:'source_both/finish_verification.js',
     					barColor: '#46a546',
    	    				backgroundColor:'#ecfaff',
     			 	});
-					var navGroup = Ti.UI.iPhone.createNavigationGroup({
+    			 	var navGroup = Ti.UI.iPhone.createNavigationGroup({
     					window:win4
 					});
 					win4.navGroup = navGroup;
-					var navWindow = Ti.UI.createWindow({
-						//height:Titanium.Platform.displayCaps.platformHeight,
-    					width:Titanium.Platform.displayCaps.platformWidth, // Set the width of the sliding window to avoid cut out from animation
-						backgroundColor:"#e2e7ed"
-					});
 					navWindow.add(navGroup);
 					navWindow.open();
 			}
 			xhr.onerror = function(e){
 				var response = this.responseText;
-				jres = JSON.parse(response);
-				alert(jres.error.message);
+				alert(response);
 			}
 			xhr.send(JSON.stringify(postData));
 
@@ -991,7 +1001,14 @@ win.add(pict);
    		 shareWhoModal3.add(view);
 		 shareWhoModal3.addEventListener('click', function(e)
 		 {
-			if(e.source.box != true)
+			if(e.source != "[object TiUITextField]")
+			{
+				name.blur();
+   				email.blur();
+   				password.blur();
+   				passwordconf.blur();
+ 			}
+			if(e.source.box != true && e.source != "[object TiUITextField]")
 			{
    				shareWhoModal3.close();
  			}
@@ -1002,10 +1019,10 @@ win.add(pict);
 	win.add(orLabel);
 	win.add(signupButton);
 
-if(Titanium.App.Properties.getString("logged_in") == 'true')
+if(Titanium.App.Properties.getString("logged_in") == 'true'  && fb.loggedIn == false)
 {
 	redirectAfterLogin();
-} else {
+} else if (fb.loggedIn != true){
 	win.open();
 }
 
