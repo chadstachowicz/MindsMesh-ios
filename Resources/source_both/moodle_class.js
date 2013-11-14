@@ -42,11 +42,11 @@ var winModal = Ti.UI.createWindow({
 			win1.fullname = Titanium.App.Properties.getString("name");
 			win1.photo_url = Titanium.App.Properties.getString("photo_url");
 			winModal.hide();
-			win.navGroup.open(win1,{animated:false});
+			win.navGroup.openWindow(win1,{animated:false});
 			} else if (e.source.type == "Topic"){
 				Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, class_id: e.source.id});
 			}
-	}
+	};
 	xhr.send();
 		
 });
@@ -113,16 +113,14 @@ grades_button.addEventListener('click', function(e){
    	 					barColor: '#46a546'
 						});
 
-					url2 = 'https://moodle.uncc.edu/grade/report/index.php?id=' + gradesid[1]
+					url2 = 'https://moodle.uncc.edu/grade/report/index.php?id=' + gradesid[1];
 					var webview = Titanium.UI.createWebView({url:url2});
 					win1.add(webview);
-					win.navGroup.open(win1,{animated:false});
+					win.navGroup.openWindow(win1,{animated:false});
 
 });
 var tableview = Titanium.UI.createTableView({
 	backgroundColor:'#ecfaff',
-	editable: 'true',
-	deleteButtonTitle: 'Leave class'
 });
 win.add(tableview);
 
@@ -263,7 +261,7 @@ xhr.onload = function(){
 			 winModal.addEventListener('click', function(e){
 			 	if(e.source.box != true){
  				winModal.hide();}
- 			})
+ 			});
 			notificationButton.addEventListener('click', function(e){
 				if (winModal.visible == true)
 				{
@@ -275,8 +273,8 @@ xhr.onload = function(){
 			
 			
 //			
-}
-xhr.send()
+};
+xhr.send();
 }
 
 
@@ -294,6 +292,10 @@ if ( Titanium.Network.online) {
 			{
 				if (course[i].modules.length > 0)
 				{
+					var section = Ti.UI.createTableViewSection({
+						headerTitle: course[i].name
+					});
+					tableview.appendSection(section);
 					for (var j = 0; j < course[i].modules.length; j++)
 					{
 						if (course[i].modules[j].modname == "resource")
@@ -314,7 +316,49 @@ if ( Titanium.Network.online) {
     							color:'#000',
    								width:'auto',
     							textAlign:'left',
-    							left: 20
+    							left: 27
+							});
+							if (j == 0){
+								var fbRow = Titanium.UI.createTableViewRow({
+ 	         					header:course[i].name,
+               					 backgroundColor:'#ecfaff',
+                				hiddenTitle: course[i].modules[j].name,
+                				FileUrl: fileurl,
+							//	hasDetail:true,
+								height:40
+            				});
+            			
+						} else {
+            				var fbRow = Titanium.UI.createTableViewRow({
+                				backgroundColor:'#ecfaff',
+                				hiddenTitle: course[i].modules[j].name,
+               	 				FileUrl: fileurl,
+							//	hasDetail:true,
+								height:40
+            				});
+        				}
+        				fbRow.add(leftImage);
+        				fbRow.add(labelTitle);
+        				tableview.appendRow(fbRow);
+						} else if (course[i].modules[j].modname == "page")
+						{
+							var fileurl = course[i].modules[j].contents[0].fileurl + '&token=' + Titanium.App.Properties.getString("moodle-token-" + win.entity_id);
+							var leftImage = Titanium.UI.createImageView({
+								image: course[i].modules[j].modicon,
+								hiddenTitle: course[i].modules[j].name,
+                				FileUrl: fileurl,
+								height: 'auto',
+								left: 2
+							});
+							var labelTitle = Titanium.UI.createLabel({
+    							text:course[i].modules[j].name,
+    							hiddenTitle: course[i].modules[j].name,
+                				FileUrl: fileurl,
+    							font:{fontSize:16,fontWeight:'bold'},
+    							color:'#000',
+   								width:'auto',
+    							textAlign:'left',
+    							left: 27
 							});
 							if (j == 0){
 								var fbRow = Titanium.UI.createTableViewRow({
@@ -325,6 +369,50 @@ if ( Titanium.Network.online) {
 								hasDetail:true,
 								height:40
             				});
+            			
+						} else {
+            				var fbRow = Titanium.UI.createTableViewRow({
+                				backgroundColor:'#ecfaff',
+                				hiddenTitle: course[i].modules[j].name,
+               	 				FileUrl: fileurl,
+								hasDetail:true,
+								height:40
+            				});
+        				}
+        				fbRow.add(leftImage);
+        				fbRow.add(labelTitle);
+        				tableview.appendRow(fbRow);
+						}  else if (course[i].modules[j].modname == "url")
+						{
+							var fileurl = course[i].modules[j].contents[0].fileurl + '&token=' + Titanium.App.Properties.getString("moodle-token-" + win.entity_id);
+							var leftImage = Titanium.UI.createImageView({
+								image: "../images/www.png",
+								hiddenTitle: course[i].modules[j].name,
+                				FileUrl: fileurl,
+								height: 'auto',
+								width: '24',
+								left: 2
+							});
+							var labelTitle = Titanium.UI.createLabel({
+    							text:course[i].modules[j].name,
+    							hiddenTitle: course[i].modules[j].name,
+                				FileUrl: fileurl,
+    							font:{fontSize:16,fontWeight:'bold'},
+    							color:'#000',
+   								width:'auto',
+    							textAlign:'left',
+    							left: 27
+							});
+							if (j == 0){
+								var fbRow = Titanium.UI.createTableViewRow({
+ 	         					header:course[i].name,
+               					 backgroundColor:'#ecfaff',
+                				hiddenTitle: course[i].modules[j].name,
+                				FileUrl: fileurl,
+								hasDetail:true,
+								height:40
+            				});
+            			
 						} else {
             				var fbRow = Titanium.UI.createTableViewRow({
                 				backgroundColor:'#ecfaff',
@@ -341,14 +429,14 @@ if ( Titanium.Network.online) {
 					}
 				}
 			}
-		}
+		};
 		xhr.send();
 	} else {	
 	xhr = getDataFromMoodle(win.Moodurl);
 	xhr.onload = function(){
 	var response = this.responseText;
 	var regex = /href=.+(http.+mod\/resource\/view\.php\?id=\d+).+<img src="(https.+gif)".+<span>(.+)<span/ig;
-	var c = 0
+	var c = 0;
 	while((hits = regex.exec(response)) !== null) {
 		var leftImage = Titanium.UI.createImageView({
 				image: hits[2],
@@ -434,7 +522,7 @@ if ( Titanium.Network.online) {
         fbRow.add(labelTitle);
         tableview.appendRow(fbRow);
 	}
-}
+};
 xhr.send();
 }
 } else {
@@ -454,14 +542,14 @@ tableview.addEventListener('click', function(e)
 					url2 = e.source.FileUrl;
 					var webview = Titanium.UI.createWebView({url:url2});
 					win1.add(webview);
-					win.navGroup.open(win1,{animated:false});
+					win.navGroup.openWindow(win1,{animated:false});
 		
 });
 win.addEventListener('focus', function() 
 {
   if ( Titanium.Network.networkType != Titanium.Network.NETWORK_NONE ) {
     beginReloading();
-    reloadNotifications()
+    reloadNotifications();
   }else{
     var alertDialog = Titanium.UI.createAlertDialog({
     title: 'Attention',

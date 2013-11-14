@@ -19,7 +19,9 @@ var ta1 = Titanium.UI.createTextArea({
 	backgroundColor:'#ecfaff',
 	color:'#888',
 	textAlign:'left',
-	appearance:Titanium.UI.KEYBOARD_APPEARANCE_ALERT,	
+	appearance:Titanium.UI.KEYBOARD_APPEARANCE_
+
+,	
 //	keyboardType:Titanium.UI.KEYBOARD_NUMBERS_PUNCTUATION,
 //	returnKeyType:Titanium.UI.RETURNKEY_SENDRETURNKEY_EMERGENCY_CALL,
 	suppressReturn:false
@@ -64,15 +66,15 @@ btnPost.addEventListener('click', function(e){
 		{
 			alert("Your post must be at least 1 character");
 		} else {
-		var postData = {'reply': {'text' :ta1.value}};
-		xhr = postReplyCreate(Titanium.App.Properties.getString("mmat"),win.postid,postData)
+		var postData = {'text' :ta1.value};
+		xhr = postReplyCreate(Titanium.App.Properties.getString("mmat"),win.postid,postData);
 		xhr.onload = function(){
 			var response = this.responseText;
 			var test = JSON.parse(response);
 			win.navGroup.close(win);
 
 		};
-		xhr.send(JSON.stringify(postData));
+		xhr.send(postData);
 		
 	}
 });

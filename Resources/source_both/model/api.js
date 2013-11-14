@@ -11,15 +11,35 @@ function errorHTTPClient(request, mode, url, data, errObj, errMsg)
         request.retries++;
     }
     else
-    {   var desc = errObj.error.substring(errObj.error.indexOf("Description=")+12,errObj.error.lastIndexOf("}"));
-    
+    {   
+    	var desc = errObj.error.substring(errObj.error.indexOf("Description=")+12,errObj.error.lastIndexOf("}"));
+    	alert("There is network connectivity issues, please confirm your connection.")
+ 
     }
 };
 function createHttpClient(mode,url,data,header)
 {
 	var xhr = Titanium.Network.createHTTPClient({timeout:3000});
 	xhr.retries = 0;
+	if(header == 'FILE'){
+		xhr.setRequestHeader("Content-Type", "multipart/form-data");
+	} else if (header != 'NONE'){
+		xhr.setRequestHeader("Content-Type", "application/json");
+	if(Titanium.Platform.osname == 'android'){
+	var androidUserAgent = 'Mozilla/5.0 (Linux; U; ' + Ti.Platform.name + ' ' + Ti.Platform.version + '; ' + Ti.Locale.currentLocale + '; ' + Ti.Platform.model + ' AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1';
+	xhr.setRequestHeader('User-Agent', androidUserAgent);}
+	}
+	xhr.onerror = function requestFailed(e) 
+	{
+		errorHTTPClient(xhr, mode, url, data, e, L("Comms Error Message"));
+	};
 	xhr.open(mode,url);
+	return xhr;
+}
+function createHttpClientNoOpen(mode,url,data,header)
+{
+	var xhr = Titanium.Network.createHTTPClient({timeout:3000});
+	xhr.retries = 0;
 	if(header == 'FILE'){
 		xhr.setRequestHeader("Content-Type", "multipart/form-data");
 	} else if (header != 'NONE'){

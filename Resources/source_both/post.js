@@ -24,7 +24,7 @@ var modalTableView = Titanium.UI.createTableView(
 	backgroundColor:'#e2e7ed',
 	box: true
 });
-		
+
 modalTableView.addEventListener('click', function(e)
 {			
 	xhr = postNotificationMarkAsRead(Titanium.App.Properties.getString("mmat"),e.source.notification_id);
@@ -48,7 +48,7 @@ modalTableView.addEventListener('click', function(e)
 		} else if (e.source.type == "Topic"){
 			Titanium.App.fireEvent('nav-menu-button',{data:true, menu_id:7, class_id: e.source.id});
 		}
-	}
+	};
 	xhr.send();	
 });
 
@@ -238,7 +238,7 @@ xhr.onload = function(){
 			 winModal.addEventListener('click', function(e){
 			 	if(e.source.box != true){
  				winModal.hide();}
- 			})
+ 			});
 			notificationButton.addEventListener('click', function(e){
 				if (winModal.visible == true)
 				{
@@ -250,14 +250,14 @@ xhr.onload = function(){
 			
 			
 //			
-}
-xhr.send()
+};
+xhr.send();
 }
 
 var brainlabel = [];
 var replybrainlabel = [];
 var btnPost = Titanium.UI.createButton({
-	title:'Answer'
+	title:'Comment'
 });
 
 btnPost.addEventListener('click', function(e){
@@ -313,11 +313,10 @@ var statusLabel = Ti.UI.createLabel({
 	shadowColor:"#999",
 	shadowOffset:{x:0,y:1}
 });
- 
 var lastUpdatedLabel = Ti.UI.createLabel({
-	text:"Last Updated: "+formatDate(),
+	text: "Updated: "+formatDate(),
 	left:55,
-	width:200,
+	width:240,
 	bottom:15,
 	height:"auto",
 	color:"#576c89",
@@ -370,7 +369,7 @@ function endReloading()
 {
 	var rd = []; tableView.data = rd;
 if ( Titanium.Network.online) {
-xhr = getPostWithChildren(Titanium.App.Properties.getString('mmat'),win.postid)
+xhr = getPostWithChildren(Titanium.App.Properties.getString('mmat'),win.postid);
 xhr.onload = function(){
 	var d = new Date();
 	var response = this.responseText;
@@ -1116,12 +1115,12 @@ function likeButton(postid, labelid)
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.onerror = function(e){
 		alert('HTTP ERR'+e.error);
-	}
+	};
 	xhr.onload = function(){
 		var response = this.responseText;
 		likeres = JSON.parse(response);
 		brainlabel[labelid].text = likeres.likes_count;
-	}
+	};
 	xhr.send();
 }
 function likeButtonReply(replyid, labelid)
@@ -1134,17 +1133,17 @@ function likeButtonReply(replyid, labelid)
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.onerror = function(e){
 		alert('HTTP ERR'+e.error);
-	}
+	};
 	xhr.onload = function(){
 		var response = this.responseText;
 		likeres = JSON.parse(response);
 		replybrainlabel[labelid].text = likeres.likes_count;
-	}
+	};
 	xhr.send();
 
 }
-win.addEventListener('focus', function() 
-{
+//win.addEventListener('focus', function() 
+//{
   if ( Titanium.Network.networkType != Titanium.Network.NETWORK_NONE ) {
   	tableView.setData([]);
     endReloading();
@@ -1157,7 +1156,7 @@ win.addEventListener('focus', function()
     });
     alertDialog.show(); 
 }  
-});
+//});
 function timeDifference(current, previous) {
 	var prev = new Date(previous);
     var msPerMinute = 60 * 1000;

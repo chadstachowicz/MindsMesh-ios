@@ -136,21 +136,20 @@ btnPost.addEventListener('click', function(e){
 				xhr = postPostCreate(Titanium.App.Properties.getString('mmat'),postData);
 			xhr.onload = function(){
 				var response = this.responseText;
-				alert(response);
 				var test = JSON.parse(response);
 				if (win.source == 'class_feed'){
 					Titanium.App.fireEvent('event_three',{data:'posted'});
 				} else {
 					Titanium.App.fireEvent('event_one',{data:'posted'});
 				}
-				win.navGroup.close(win);
+				win.navGroup.closeWindow(win);
 
 			};
 			xhr.send(postData);
 				
 			
 		} else {
-			alert("A reasonable post should have at least 5 chars.")
+			alert("A reasonable post should have at least 5 chars.");
 		}
 			
 		
