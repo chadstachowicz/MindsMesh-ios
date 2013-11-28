@@ -131,6 +131,10 @@ penView1.addEventListener('click', function(e)
 		navGroup: win.navGroup,
     	url:'make_post.js',
     	topic_id: win.topic_id,
+   		backgroundColor:"#ffffff",
+   		navTintColor: "#ffffff",
+		statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   		translucent: false,
     	group_id: win.group_id,
     	barColor: '#46a546',
     });
@@ -239,12 +243,7 @@ photoView1.addEventListener('click', function(e)
 								{
 									f.deleteFile();
 								}
-								var imageView = Titanium.UI.createImageView({
-            						image:currentFile,
-            						 width:480,
-           							 height:640
-        						});
-        						image = imageView.toImage();
+								image = currentFile.imageAsResized(currentFile.width / 4, currentFile.height / 4);
 								f.write(image);
 								var env = 'development';
  								if(Ti.App.Properties.getString('production')=='true')
@@ -320,6 +319,9 @@ photoView1.addEventListener('click', function(e)
 				var picModal = Ti.UI.createWindow({
         			backgroundColor : 'black',
         			barColor: '#46a546',
+        			navTintColor: "#ffffff",
+				    statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   				    translucent: false,
         			title: 'Picture',
         			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
 				});
@@ -729,6 +731,9 @@ btnBar.addEventListener('click', function(e) {
    	 	navGroup: win.navGroup,
    	 	class_id: win.topic_id,
    	 	backgroundColor:'#ecfaff',
+   	 	navTintColor: "#ffffff",
+		statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   		translucent: false,
    	 	layout:'absolute',
    	 	barColor: '#46a546'
    	});
@@ -778,6 +783,9 @@ btnBar.addEventListener('click', function(e) {
     					url:'moodle_class.js',
     					navGroup: win.navGroup,
     					backgroundColor:'#ecfaff',
+    					navTintColor: "#ffffff",
+    					statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   	    				translucent: false,
     					barColor: '#46a546'
 					});
 					win1.class_id = courses[c].id;
@@ -959,7 +967,10 @@ var winModal = Ti.UI.createWindow({
 				var win1 = Titanium.UI.createWindow({  
     			url:'post.js',
     			navGroup: win.navGroup,
-    			backgroundColor:'#CDC9C9',
+    			navTintColor: "#ffffff",
+				statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   				translucent: false,
+   				backgroundColor:"#CDC9C9",
     			barColor: '#46a546',
     			notModal: winModal
 			});
@@ -1122,10 +1133,11 @@ xhr.onload = function(){
     			notification_id: user.unread[i].id,
     			id:user.unread[i].target_id,
     			type: user.unread[i].target_type,
-    			font:{fontSize:16,fontWeight:'bold'},
+    			font:{fontSize:'16dp',fontWeight:'bold'},
     			color:'#000',
    				width:'auto',
     			textAlign:'left',
+    			top: 0,
     			left: 10
  
 			});
@@ -1135,17 +1147,17 @@ xhr.onload = function(){
     			notification_id: user.unread[i].id,
     			id:user.unread[i].target_id,
     			type: user.unread[i].target_type,
-    			font:{fontSize:11},
+    			font:{fontSize:'14dp'},
     			color:'#000',
-    			height: 12,
    				width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 45,
     			textAlign:'left',
-    			left: 10
+    			left: 10,
+    			top: 18
  
 			});
 			var flag = Titanium.UI.createImageView({
 				image: '../images/flag_new_red.png',
-				top: -27,
+				top: 7,
 				right: 12,
 				notification_id: user.unread[i].id,
 				id:user.unread[i].target_id,
@@ -1160,7 +1172,6 @@ xhr.onload = function(){
                 notification_id: user.unread[i].id,
                 id:user.unread[i].target_id,
                 type: user.unread[i].target_type,
-                layout: 'vertical',
                 height: 40
           });
             fbRow.add(classNumber);
@@ -1175,11 +1186,12 @@ xhr.onload = function(){
     			notification_id: user.read[i].id,
     			id:user.read[i].target_id,
     			type: user.read[i].target_type,
-    			font:{fontSize:16,fontWeight:'bold'},
+    			font:{fontSize:'16dp',fontWeight:'bold'},
     			color:'#000',
    				width:'auto',
     			textAlign:'left',
-    			left: 10
+    			left: 10,
+    			top:0
  
 			});
 			var classTitle = Titanium.UI.createLabel({
@@ -1188,12 +1200,12 @@ xhr.onload = function(){
     			notification_id: user.read[i].id,
     			id:user.read[i].target_id,
     			type: user.read[i].target_type,
-    			font:{fontSize:11},
+    			font:{fontSize:'14dp'},
     			color:'#000',
-    			height: 12,
    				width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 45,
     			textAlign:'left',
-    			left: 10
+    			left: 10,
+    			top: 18
  
 			});
 		var fbRow = Titanium.UI.createTableViewRow({
@@ -1202,7 +1214,6 @@ xhr.onload = function(){
                 notification_id: user.read[i].id,
                 id:user.read[i].target_id,
                 type: user.read[i].target_type,
-                layout: 'vertical',
                 height: 40
           });
             fbRow.add(classNumber);
@@ -1245,7 +1256,10 @@ xhr.send();
 				var win1 = Titanium.UI.createWindow({  
     			url:'post.js',
     			navGroup: win.navGroup,
-  				backgroundColor:'#CDC9C9',
+  				navTintColor: "#ffffff",
+							statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   							translucent: false,
+   							backgroundColor:"#CDC9C9",
   				barColor: '#46a546'
 				});
 				win1.postid = e.rowData.result;
@@ -1812,6 +1826,9 @@ if (Titanium.Platform.osname == "iphone"){
 				movPict.addEventListener('click', function(e){
 					var movieModal2 = Ti.UI.createWindow({
         		 	backgroundColor : '#00000000',
+        		 	navTintColor: "#ffffff",
+				    statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   				    translucent: false,
         			barColor: '#46a546',
         			title: 'Video',
         			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
@@ -1836,6 +1853,9 @@ if (Titanium.Platform.osname == "iphone"){
 				var movieModal2 = Ti.UI.createWindow({
         		 	backgroundColor : '#00000000',
         			barColor: '#46a546',
+        			navTintColor: "#ffffff",
+				    statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   				    translucent: false,
         			title: 'Video',
         			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
 
@@ -1871,6 +1891,9 @@ if (Titanium.Platform.osname == "iphone"){
 					var picModal2 = Ti.UI.createWindow({
         			backgroundColor : 'black',
         			barColor: '#46a546',
+        			navTintColor: "#ffffff",
+				    statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   				    translucent: false,
         			title: 'Picture',
         			orientationModes:[Ti.UI.LANDSCAPE_LEFT, Ti.UI.LANDSCAPE_RIGHT,Ti.UI.PORTRAIT,Ti.UI.UPSIDE_PORTRAIT]
 				});
@@ -2082,6 +2105,9 @@ if (Titanium.Platform.osname == "iphone"){
 		var win1 = Titanium.UI.createWindow({  
     			url:'moodle_class.js',
     			navGroup: win.navGroup,
+    			navTintColor: "#ffffff",
+    			statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   	    		translucent: false,
     			backgroundColor:'#ecfaff',
     			barColor: '#46a546'
 			});

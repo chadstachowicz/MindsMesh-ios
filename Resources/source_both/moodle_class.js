@@ -171,10 +171,11 @@ xhr.onload = function(){
     			notification_id: user.unread[i].id,
     			id:user.unread[i].target_id,
     			type: user.unread[i].target_type,
-    			font:{fontSize:16,fontWeight:'bold'},
+    			font:{fontSize:'16dp',fontWeight:'bold'},
     			color:'#000',
    				width:'auto',
     			textAlign:'left',
+    			top: 0,
     			left: 10
  
 			});
@@ -184,17 +185,17 @@ xhr.onload = function(){
     			notification_id: user.unread[i].id,
     			id:user.unread[i].target_id,
     			type: user.unread[i].target_type,
-    			font:{fontSize:11},
+    			font:{fontSize:'14dp'},
     			color:'#000',
-    			height: 12,
    				width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 45,
     			textAlign:'left',
-    			left: 10
+    			left: 10,
+    			top: 18
  
 			});
 			var flag = Titanium.UI.createImageView({
 				image: '../images/flag_new_red.png',
-				top: -27,
+				top: 7,
 				right: 12,
 				notification_id: user.unread[i].id,
 				id:user.unread[i].target_id,
@@ -209,7 +210,6 @@ xhr.onload = function(){
                 notification_id: user.unread[i].id,
                 id:user.unread[i].target_id,
                 type: user.unread[i].target_type,
-                layout: 'vertical',
                 height: 40
           });
             fbRow.add(classNumber);
@@ -224,11 +224,12 @@ xhr.onload = function(){
     			notification_id: user.read[i].id,
     			id:user.read[i].target_id,
     			type: user.read[i].target_type,
-    			font:{fontSize:16,fontWeight:'bold'},
+    			font:{fontSize:'16dp',fontWeight:'bold'},
     			color:'#000',
    				width:'auto',
     			textAlign:'left',
-    			left: 10
+    			left: 10,
+    			top:0
  
 			});
 			var classTitle = Titanium.UI.createLabel({
@@ -237,12 +238,12 @@ xhr.onload = function(){
     			notification_id: user.read[i].id,
     			id:user.read[i].target_id,
     			type: user.read[i].target_type,
-    			font:{fontSize:11},
+    			font:{fontSize:'14dp'},
     			color:'#000',
-    			height: 12,
    				width:(Titanium.Platform.displayCaps.platformWidth * .85 ) - 45,
     			textAlign:'left',
-    			left: 10
+    			left: 10,
+    			top: 18
  
 			});
 		var fbRow = Titanium.UI.createTableViewRow({
@@ -251,7 +252,6 @@ xhr.onload = function(){
                 notification_id: user.read[i].id,
                 id:user.read[i].target_id,
                 type: user.read[i].target_type,
-                layout: 'vertical',
                 height: 40
           });
             fbRow.add(classNumber);
@@ -266,8 +266,9 @@ xhr.onload = function(){
 				if (winModal.visible == true)
 				{
 					winModal.show();	
+				} else {
+					winModal.open();
 				}
-				winModal.open();
 				winModal.visible = true;
 			});
 			
@@ -409,7 +410,6 @@ if ( Titanium.Network.online) {
                					 backgroundColor:'#ecfaff',
                 				hiddenTitle: course[i].modules[j].name,
                 				FileUrl: fileurl,
-								hasDetail:true,
 								height:40
             				});
             			
@@ -418,7 +418,7 @@ if ( Titanium.Network.online) {
                 				backgroundColor:'#ecfaff',
                 				hiddenTitle: course[i].modules[j].name,
                	 				FileUrl: fileurl,
-								hasDetail:true,
+							//	hasDetail:true,
 								height:40
             				});
         				}
@@ -536,6 +536,9 @@ tableview.addEventListener('click', function(e)
     					title:e.source.hiddenTitle,
    	 					backgroundColor:'#ecfaff',
    	 					layout:'absolute',
+   	 					navTintColor: "#ffffff",
+    					statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   	    				translucent: false,
    	 					barColor: '#46a546'
 						});
 

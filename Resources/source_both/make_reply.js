@@ -16,7 +16,7 @@ var ta1 = Titanium.UI.createTextArea({
 	left:55,
 	height: 155,
 	width: (Titanium.Platform.displayCaps.platformWidth - 55),
-	backgroundColor:'#ecfaff',
+	backgroundColor:'#ffffff',
 	color:'#888',
 	textAlign:'left',
 	appearance:Titanium.UI.KEYBOARD_APPEARANCE_
@@ -43,7 +43,7 @@ win.add(ta1);
 	left:80,
 	height: 155,
 	width: (Titanium.Platform.displayCaps.platformWidth - 75),
-	backgroundColor:'#ecfaff',
+	backgroundColor:'#ffffff',
 	color:'#888',
 	textAlign:'left',
 	appearance:Titanium.UI.KEYBOARD_APPEARANCE_ALERT,	
@@ -71,7 +71,7 @@ btnPost.addEventListener('click', function(e){
 		xhr.onload = function(){
 			var response = this.responseText;
 			var test = JSON.parse(response);
-			win.navGroup.close(win);
+			win.navGroup.closeWindow(win);
 
 		};
 		xhr.send(postData);

@@ -14,7 +14,7 @@ var win = Titanium.UI.createWindow({
 //// ---- Menu window, positioned on the left
 var menuWindow = Ti.UI.createWindow({
     top:0,
-    backgroundColor:"#e2e7ed",
+    backgroundColor:"#252525",
     left:0,
     width:Titanium.Platform.displayCaps.platformWidth,
 });
@@ -37,6 +37,7 @@ var menuTableView = Ti.UI.createTableView({
     backgroundColor:'#252525',
     separatorColor: '#000',
     width: 260,
+    top: 20,
     left:0
 });
 menuTableView.addEventListener('click', function(e)
@@ -432,9 +433,10 @@ function redirectAfterLogin() {
 						var win1 = Titanium.UI.createWindow({  
     						title:'Single Post',
     						url:'source_both/post.js',
-    						backgroundColor:'#CDC9C9',
-    						statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+    						navTintColor: "#ffffff",
+							statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
    							translucent: false,
+   							backgroundColor:"#CDC9C9",
     						barColor: '#46a546',
     						navGroup: navGroup
 						});
@@ -466,10 +468,13 @@ Ti.Gesture.addEventListener('orientationchange',function(e){
 var win1 = Titanium.UI.createWindow({  
     url:'source_both/feed.js',
     navTintColor: "#ffffff",
+    navTintColor: "#ffffff",
+	backgroundColor:"#CDC9C9",
+	statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   	translucent: false,
     barColor: '#46a546',
     statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
    	translucent: false,
-    backgroundColor:"#CDC9C9",
 });
 	var win4 = Titanium.UI.createWindow({
    					url:'source_both/finish_verification.js',
@@ -482,7 +487,9 @@ var win1 = Titanium.UI.createWindow({
    					url:'source_both/moodle_account.js',
     				barColor: '#46a546',
    	    			backgroundColor:"#e2e7ed",
-   	    			translucent: false,
+   	    			navTintColor: "#ffffff",
+				    statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   				    translucent: false,
     			 });
 if(Titanium.Platform.osname == 'iphone' || Titanium.Platform.osname == 'ipad'){
 if (Titanium.App.Properties.getString("num_entities") == 0){
@@ -626,6 +633,9 @@ Titanium.App.addEventListener('nav-menu-button', function(e)
    					statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
    					translucent: false,
     				barColor: '#46a546',
+    				navTintColor: "#ffffff",
+				    statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   				    translucent: false,
     				navGroup: navGroup,
    	    			backgroundColor:"#e2e7ed",
     			 });
@@ -694,8 +704,9 @@ Titanium.App.addEventListener('nav-menu-button', function(e)
     				title:'Moodle Account',
    					url:'source_both/moodle_account.js',
     				barColor: '#46a546',
-    				translucent: false,
-    				statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+    				navTintColor: "#ffffff",
+				    statusBarStyle: Titanium.UI.iPhone.StatusBar.LIGHT_CONTENT,
+   				    translucent: false,
     				navGroup: navGroup,
    	    			backgroundColor:"#e2e7ed",
        				moving:false, // Custom property for movement
